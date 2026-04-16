@@ -20,9 +20,11 @@
   --color-blue-light:       #5DADE2;
   --color-blue-pale:        #EAF3FB;
 
-  /* ── V-AQcT Brand (PENDING VERIFICATION against SVG) ── */
-  --color-ink:              #111111;
-  --color-accent:           #EEE815;
+  /* ── A-PAG Brand (extracted from logo) ── */
+  --color-ink:              #111111;  /* A-PAG black */
+  --color-accent:           #EEE815;  /* A-PAG yellow */
+  --color-accent-hover:     #D4D013;  /* darker yellow for hover */
+  --color-accent-soft:      #FFFDE0;  /* pale yellow for active tab bg */
 
   /* ── Page & Surface ── */
   --color-page:             #FFFFFF;
@@ -91,9 +93,11 @@
   --color-blue-light:     var(--color-blue-light);
   --color-blue-pale:      var(--color-blue-pale);
 
-  /* V-AQcT Brand */
+  /* A-PAG Brand */
   --color-ink:            var(--color-ink);
   --color-accent:         var(--color-accent);
+  --color-accent-hover:   var(--color-accent-hover);
+  --color-accent-soft:    var(--color-accent-soft);
 
   /* Page & Surface */
   --color-page:           var(--color-page);

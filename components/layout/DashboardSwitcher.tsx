@@ -1,35 +1,34 @@
 // FILE: components/layout/DashboardSwitcher.tsx
-// PURPOSE: PMO / AQI dashboard switcher dropdowns in the top bar
-// DESIGN REF: Wireframe pages 7–11 (right side of top bar on every dashboard page)
+// PURPOSE: PMO / AQI dashboard switcher links — compact for top strip
+// DESIGN REF: Wireframe pages 7–11 (right side of top bar)
 
-import { LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const dashboards = [
+  { label: 'PMO', href: '#' },
+  { label: 'AQI', href: '#' },
+];
 
 interface DashboardSwitcherProps {
   className?: string;
 }
 
-const dashboards = [
-  { label: 'PMO Dashboard', href: '#' },
-  { label: 'AQI Dashboard', href: '#' },
-];
-
 export default function DashboardSwitcher({ className }: DashboardSwitcherProps) {
   return (
-    <div className={cn('flex items-center gap-3', className)}>
+    <div className={cn('flex items-center gap-1.5', className)}>
+      <span className="mr-1 text-xs text-white/50">Switch:</span>
       {dashboards.map((d) => (
         <a
           key={d.label}
           href={d.href}
           className={cn(
-            'flex min-h-[44px] items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-            'bg-[var(--color-navy-mid)] text-[var(--color-text-white)]',
-            'hover:bg-[var(--color-navy)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
+            'flex min-h-[32px] items-center rounded px-3 py-1 text-xs font-medium transition-colors',
+            'bg-white/10 text-white/80',
+            'hover:bg-white/20 hover:text-white',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]',
           )}
         >
-          <LayoutDashboard className="h-4 w-4" />
-          <span>{d.label}</span>
+          {d.label}
         </a>
       ))}
     </div>
