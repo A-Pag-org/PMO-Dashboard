@@ -134,31 +134,144 @@ export const DASHBOARD_OPTIONS: DashboardOption[] = [
   { name: 'AQI Dashboard', slug: 'aqi', label: 'AQI DASHBOARD', sublabel: '(Phase 3 - TBD)', active: false, color: 'orange' },
 ];
 
-// ─── Mock Data: Summary Page Table (wireframe page 8) ──────────────────
+// ─── Mock Data: Per-Initiative Summary (map + table) ────────────────────
 // TODO: replace with API call
+// Keyed by initiative slug. Each entry has state-level table rows,
+// map data points, and a center bubble for the aggregate.
 
-export const MOCK_SUMMARY_TABLE: SummaryTableRow[] = [
-  { state: 'Delhi',         target: 3200, achieved: 2240, completion: 70 },
-  { state: 'Uttar Pradesh', target: 2000, achieved: 500,  completion: 40 },
-  { state: 'Haryana',       target: 2500, achieved: 500,  completion: 20 },
-  { state: 'Rajasthan',     target: 1500, achieved: 750,  completion: 50 },
-];
+export interface InitiativeSummaryData {
+  table: SummaryTableRow[];
+  map: MapDataPoint[];
+  center: MapCenterBubble;
+}
 
-// ─── Mock Data: Summary Map — State Level (wireframe page 7) ───────────
-// TODO: replace with API call
-
-export const MOCK_SUMMARY_MAP_DATA: MapDataPoint[] = [
-  { name: 'Haryana',        value: 7280, onTrack: true, label: '7,280 Trucks / 1,820 Buses' },
-  { name: 'Uttar Pradesh',  value: 4640, onTrack: true, label: '4,640 Trucks / 1,160 Buses' },
-  { name: 'Delhi',          value: 1760, onTrack: true, label: '1,760 / 440 Buses' },
-  { name: 'Rajasthan',      value: 1920, onTrack: true, label: '1,920 Trucks / 480 Buses' },
-];
-
-export const MOCK_SUMMARY_CENTER_BUBBLE: MapCenterBubble = {
-  value: 15300,
-  label: 'Pre-BS VI Trucks/Buses Converted',
-  subtitle: '76,496 / 1,91,239 trucks',
+export const MOCK_SUMMARY_BY_INITIATIVE: Record<string, InitiativeSummaryData> = {
+  'naya-safar-yojana': {
+    table: [
+      { state: 'Delhi',         target: 3200, achieved: 2240, completion: 70 },
+      { state: 'Uttar Pradesh', target: 2000, achieved: 500,  completion: 25 },
+      { state: 'Haryana',       target: 2500, achieved: 500,  completion: 20 },
+      { state: 'Rajasthan',     target: 1500, achieved: 750,  completion: 50 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 2240, onTrack: true,  label: '1,760 Trucks / 480 Buses' },
+      { name: 'Uttar Pradesh',  value: 500,  onTrack: false, label: '400 Trucks / 100 Buses' },
+      { name: 'Haryana',        value: 500,  onTrack: false, label: '380 Trucks / 120 Buses' },
+      { name: 'Rajasthan',      value: 750,  onTrack: true,  label: '600 Trucks / 150 Buses' },
+    ],
+    center: { value: 15300, label: 'Pre-BS VI Trucks/Buses Converted', subtitle: '76,496 / 1,91,239 trucks' },
+  },
+  'cd-iccc': {
+    table: [
+      { state: 'Delhi',         target: 35, achieved: 28, completion: 80 },
+      { state: 'Uttar Pradesh', target: 25, achieved: 8,  completion: 32 },
+      { state: 'Haryana',       target: 20, achieved: 5,  completion: 25 },
+      { state: 'Rajasthan',     target: 20, achieved: 4,  completion: 20 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 28, onTrack: true,  label: '28 sites' },
+      { name: 'Uttar Pradesh',  value: 8,  onTrack: false, label: '8 sites' },
+      { name: 'Haryana',        value: 5,  onTrack: false, label: '5 sites' },
+      { name: 'Rajasthan',      value: 4,  onTrack: false, label: '4 sites' },
+    ],
+    center: { value: 45, label: 'Sites Integrated in ICCC', subtitle: '45 / 100 sites' },
+  },
+  'cems-apcd': {
+    table: [
+      { state: 'Delhi',         target: 180, achieved: 126, completion: 70 },
+      { state: 'Uttar Pradesh', target: 120, achieved: 36,  completion: 30 },
+      { state: 'Haryana',       target: 100, achieved: 28,  completion: 28 },
+      { state: 'Rajasthan',     target: 100, achieved: 20,  completion: 20 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 126, onTrack: true,  label: '126 industries' },
+      { name: 'Uttar Pradesh',  value: 36,  onTrack: false, label: '36 industries' },
+      { name: 'Haryana',        value: 28,  onTrack: false, label: '28 industries' },
+      { name: 'Rajasthan',      value: 20,  onTrack: false, label: '20 industries' },
+    ],
+    center: { value: 210, label: 'Industries with CEMS/APCDs', subtitle: '210 / 500 industries' },
+  },
+  'road-repair': {
+    table: [
+      { state: 'Delhi',         target: 400, achieved: 320, completion: 80 },
+      { state: 'Uttar Pradesh', target: 300, achieved: 180, completion: 60 },
+      { state: 'Haryana',       target: 300, achieved: 180, completion: 60 },
+      { state: 'Rajasthan',     target: 200, achieved: 100, completion: 50 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 320, onTrack: true, label: '320 km' },
+      { name: 'Uttar Pradesh',  value: 180, onTrack: true, label: '180 km' },
+      { name: 'Haryana',        value: 180, onTrack: true, label: '180 km' },
+      { name: 'Rajasthan',      value: 100, onTrack: true, label: '100 km' },
+    ],
+    center: { value: 780, label: 'Km Road-Length Repaired', subtitle: '780 / 1,200 km' },
+  },
+  'green-cess': {
+    table: [
+      { state: 'Delhi',         target: 15, achieved: 14, completion: 93 },
+      { state: 'Uttar Pradesh', target: 12, achieved: 8,  completion: 67 },
+      { state: 'Haryana',       target: 13, achieved: 6,  completion: 46 },
+      { state: 'Rajasthan',     target: 10, achieved: 4,  completion: 40 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 14, onTrack: true,  label: '14 tolls' },
+      { name: 'Uttar Pradesh',  value: 8,  onTrack: true,  label: '8 tolls' },
+      { name: 'Haryana',        value: 6,  onTrack: true,  label: '6 tolls' },
+      { name: 'Rajasthan',      value: 4,  onTrack: false, label: '4 tolls' },
+    ],
+    center: { value: 32, label: 'Tolls with Cess Collection', subtitle: '32 / 50 tolls' },
+  },
+  'cd-scc': {
+    table: [
+      { state: 'Delhi',         target: 150, achieved: 90,  completion: 60 },
+      { state: 'Uttar Pradesh', target: 150, achieved: 55,  completion: 37 },
+      { state: 'Haryana',       target: 100, achieved: 30,  completion: 30 },
+      { state: 'Rajasthan',     target: 100, achieved: 25,  completion: 25 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 90, onTrack: true,  label: '90 SCC' },
+      { name: 'Uttar Pradesh',  value: 55, onTrack: false, label: '55 SCC' },
+      { name: 'Haryana',        value: 30, onTrack: false, label: '30 SCC' },
+      { name: 'Rajasthan',      value: 25, onTrack: false, label: '25 SCC' },
+    ],
+    center: { value: 200, label: 'SCC Setup Achieved', subtitle: '200 / 500 sites' },
+  },
+  'greening': {
+    table: [
+      { state: 'Delhi',         target: 30, achieved: 24, completion: 80 },
+      { state: 'Uttar Pradesh', target: 25, achieved: 15, completion: 60 },
+      { state: 'Haryana',       target: 25, achieved: 12, completion: 48 },
+      { state: 'Rajasthan',     target: 20, achieved: 9,  completion: 45 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 24, onTrack: true, label: '24 zones' },
+      { name: 'Uttar Pradesh',  value: 15, onTrack: true, label: '15 zones' },
+      { name: 'Haryana',        value: 12, onTrack: true, label: '12 zones' },
+      { name: 'Rajasthan',      value: 9,  onTrack: true, label: '9 zones' },
+    ],
+    center: { value: 60, label: 'Greening Action Plan Phase 1', subtitle: '60 / 100 zones' },
+  },
+  'mrs': {
+    table: [
+      { state: 'Delhi',         target: 60, achieved: 54,  completion: 90 },
+      { state: 'Uttar Pradesh', target: 50, achieved: 35,  completion: 70 },
+      { state: 'Haryana',       target: 50, achieved: 30,  completion: 60 },
+      { state: 'Rajasthan',     target: 40, achieved: 21,  completion: 53 },
+    ],
+    map: [
+      { name: 'Delhi',          value: 54, onTrack: true, label: '54 routes' },
+      { name: 'Uttar Pradesh',  value: 35, onTrack: true, label: '35 routes' },
+      { name: 'Haryana',        value: 30, onTrack: true, label: '30 routes' },
+      { name: 'Rajasthan',      value: 21, onTrack: true, label: '21 routes' },
+    ],
+    center: { value: 140, label: 'Route Coverage Achieved', subtitle: '140 / 200 routes' },
+  },
 };
+
+// Legacy single-set exports kept for backward compat with detail page
+export const MOCK_SUMMARY_TABLE: SummaryTableRow[] = MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'].table;
+export const MOCK_SUMMARY_MAP_DATA: MapDataPoint[] = MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'].map;
+export const MOCK_SUMMARY_CENTER_BUBBLE: MapCenterBubble = MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'].center;
 
 // ─── Mock Data: Detail Page Map — City Level (wireframe page 9) ────────
 // TODO: replace with API call
