@@ -1,5 +1,5 @@
 // FILE: app/dashboard/detail/page.tsx
-// PURPOSE: Detailed view page — uses shared layout components, content placeholder for Block 4
+// PURPOSE: Detailed view page — uses shared layout components, content coming in a future block
 // DESIGN REF: Wireframe pages 9–10 of 13
 
 import TopBar from '@/components/layout/TopBar';
@@ -12,7 +12,7 @@ export default function DetailPage() {
 
       <main className="flex flex-1 items-center justify-center p-8">
         <p className="text-lg text-[var(--color-text-muted)]">
-          Filters, map, metrics, and data tables will be built in Block 4.
+          Detailed view content (filters, map, metrics, data tables) — coming soon.
         </p>
       </main>
 

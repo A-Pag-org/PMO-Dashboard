@@ -1,5 +1,5 @@
 // FILE: app/dashboard/summary/page.tsx
-// PURPOSE: Summary page — uses shared layout components, content placeholder for Block 3
+// PURPOSE: Summary page — uses shared layout components, content coming in next block
 // DESIGN REF: Wireframe pages 7–8 of 13
 
 import TopBar from '@/components/layout/TopBar';
@@ -18,7 +18,7 @@ export default function SummaryPage() {
 
       <main className="flex flex-1 items-center justify-center p-8">
         <p className="text-lg text-[var(--color-text-muted)]">
-          Initiative cards, map, and table will be built in Block 3.
+          Summary page content (initiative cards, map, and table) — coming next.
         </p>
       </main>
 
