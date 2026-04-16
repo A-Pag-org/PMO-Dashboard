@@ -30,7 +30,7 @@ export default function InitiativeCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'group relative flex w-full flex-col rounded-md border px-3 py-2 text-left transition-all',
+        'group relative flex h-full w-full flex-col justify-between rounded-md border px-3 py-2 text-left transition-all',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
         selected
           ? 'border-[var(--color-border-blue)] bg-white shadow-md'
