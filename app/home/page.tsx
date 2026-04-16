@@ -1,32 +1,39 @@
 // FILE: app/home/page.tsx
-// PURPOSE: Dashboard selection page — placeholder until full UI is built
+// PURPOSE: Dashboard selection page — blue header + 3-column card grid
 // DESIGN REF: Wireframe page 6 of 13 (Dashboard selection)
 
-import Link from 'next/link';
+import { DASHBOARD_OPTIONS } from '@/lib/constants';
+import DashboardCard from '@/components/ui/DashboardCard';
+
+const hrefMap: Record<string, string> = {
+  impact: '/dashboard/summary',
+};
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[var(--color-surface-grey)]">
-      <div className="bg-[var(--color-blue-panel)] px-8 py-10">
+    <div className="flex min-h-screen flex-col bg-[var(--color-surface-grey)]">
+      {/* ── Blue gradient header ── */}
+      <header className="bg-gradient-to-br from-[var(--color-blue-panel)] to-[var(--color-blue-header)] px-8 pb-12 pt-10">
         <h1 className="text-2xl font-bold text-[var(--color-text-white)]">
           Dashboard selection
         </h1>
-      </div>
-      <div className="mx-auto grid max-w-4xl grid-cols-3 gap-6 px-8 py-12">
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-grey)] p-8 text-center">
-          <p className="text-lg font-bold text-[var(--color-blue-link)]">PMO DASHBOARD</p>
+        <p className="mt-1 text-sm text-[var(--color-blue-light)] opacity-80">
+          Choose a dashboard to continue
+        </p>
+      </header>
+
+      {/* ── Card grid — overlaps the header ── */}
+      <main className="-mt-4 flex flex-1 justify-center px-8 pb-16">
+        <div className="grid w-full max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
+          {DASHBOARD_OPTIONS.map((d) => (
+            <DashboardCard
+              key={d.slug}
+              dashboard={d}
+              href={hrefMap[d.slug]}
+            />
+          ))}
         </div>
-        <Link
-          href="/dashboard/summary"
-          className="rounded-lg border-2 border-[var(--color-border-blue)] bg-white p-8 text-center shadow-md transition-shadow hover:shadow-lg"
-        >
-          <p className="text-lg font-bold text-[var(--color-blue-link)]">IMPACT DASHBOARD</p>
-        </Link>
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-grey)] p-8 text-center">
-          <p className="text-lg font-bold text-[var(--color-text-orange)]">AQI DASHBOARD</p>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">(Phase 3 - TBD)</p>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
