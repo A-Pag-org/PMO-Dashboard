@@ -340,72 +340,109 @@ export const MOCK_DETAIL_TABLE_ALL: DetailTableRow[] = [
 // Legacy alias
 export const MOCK_DETAIL_TABLE = MOCK_DETAIL_TABLE_ALL;
 
-// ─── Mock Data: Upload Page Rows (wireframe page 11) ───────────────────
+// ─── Mock Data: Upload Page Rows — per initiative, all 9 cities ─────────
 // TODO: replace with API call
+// Keyed by initiative slug. Each has rows for cities with realistic metrics.
 
-export const MOCK_UPLOAD_ROWS: UploadRow[] = [
-  {
-    geography: 'Noida', metric: 'No. of SCC setup achieved', metricType: 'outcome',
-    targetVal: 500, currentVal: 200, unit: '-', newVal: '', lastUpdated: '2026-04-10T14:30:00',
-    lastUpdatedBy: 'admin@noida.gov.in', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Noida', metric: 'Total quantum of malba received at SCC', metricType: 'outcome',
-    targetVal: 400, currentVal: 50, unit: 'MMT', newVal: '', lastUpdated: '2026-04-10T14:30:00',
-    lastUpdatedBy: 'admin@noida.gov.in', startDate: '2026-01-01', endDate: '2026-12-31', remarks: '',
-  },
-  {
-    geography: 'Noida', metric: 'No. of SCC identified (land parcels earmarked)', metricType: 'progress',
-    targetVal: null, currentVal: 30, unit: '-', newVal: '', lastUpdated: '2026-04-10T14:30:00',
-    lastUpdatedBy: 'admin@noida.gov.in', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Noida', metric: 'No. of SCC required', metricType: 'readiness',
-    targetVal: null, currentVal: 500, unit: '-', newVal: '', lastUpdated: '2026-04-10T14:30:00',
-    lastUpdatedBy: 'admin@noida.gov.in', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Greater Noida', metric: 'No. of SCC setup achieved', metricType: 'outcome',
-    targetVal: null, currentVal: null, unit: '-', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Greater Noida', metric: 'Total quantum of malba received at SCC', metricType: 'outcome',
-    targetVal: null, currentVal: null, unit: 'MMT', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Greater Noida', metric: 'No. of SCC identified (land parcels earmarked)', metricType: 'progress',
-    targetVal: null, currentVal: null, unit: '-', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Greater Noida', metric: 'No. of SCC required', metricType: 'readiness',
-    targetVal: null, currentVal: null, unit: '-', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Ghaziabad', metric: 'No. of SCC setup achieved', metricType: 'outcome',
-    targetVal: null, currentVal: null, unit: '-', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-  {
-    geography: 'Ghaziabad', metric: 'Total quantum of malba received at SCC', metricType: 'outcome',
-    targetVal: null, currentVal: null, unit: 'MMT', newVal: '', lastUpdated: '',
-    lastUpdatedBy: '', startDate: '', endDate: '', remarks: '',
-  },
-];
+function makeUploadRows(
+  cities: string[],
+  metrics: { name: string; type: 'outcome' | 'progress' | 'readiness'; unit: string; hasDates?: boolean }[],
+  filledCities: string[],
+): UploadRow[] {
+  const rows: UploadRow[] = [];
+  for (const city of cities) {
+    const hasFill = filledCities.includes(city);
+    for (const m of metrics) {
+      rows.push({
+        geography: city,
+        metric: m.name,
+        metricType: m.type,
+        targetVal: hasFill ? Math.floor(Math.random() * 400 + 100) : null,
+        currentVal: hasFill ? Math.floor(Math.random() * 200 + 10) : null,
+        unit: m.unit,
+        newVal: '',
+        lastUpdated: hasFill ? '2026-04-10T14:30:00' : '',
+        lastUpdatedBy: hasFill ? `admin@${city.toLowerCase().replace(/\s+/g, '')}.gov.in` : '',
+        startDate: m.hasDates && hasFill ? '2026-01-01' : '',
+        endDate: m.hasDates && hasFill ? '2026-12-31' : '',
+        remarks: '',
+      });
+    }
+  }
+  return rows;
+}
 
-// ─── Filter Options for Upload Page (wireframe page 11) ────────────────
+const ALL_CITIES_ORDERED = ['Delhi', 'Noida', 'Greater Noida', 'Ghaziabad', 'Gurugram', 'Rohtak', 'Panipat', 'Neemrana', 'Alwar'];
 
-export const UPLOAD_INITIATIVE_OPTIONS = [
-  'CEMS and APCD Installation',
-  'Construction dust and waste - ICCC',
-  'Road repair and remediation',
-  'MRS',
-  'Construction dust and waste - SCC setup and operations',
-  'Greening',
-] as const;
+export const MOCK_UPLOAD_BY_INITIATIVE: Record<string, UploadRow[]> = {
+  'naya-safar-yojana': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: 'Pre-BS VI trucks / buses converted', type: 'outcome', unit: 'vehicles' },
+    { name: 'No. of Events Conducted', type: 'outcome', unit: '-' },
+    { name: 'No. of Events Planned', type: 'progress', unit: '-' },
+    { name: 'No. of Outlets Activated', type: 'progress', unit: '-' },
+  ], ['Delhi', 'Noida', 'Gurugram']),
+
+  'cd-iccc': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: '# sites integrated in ICCC', type: 'outcome', unit: 'sites' },
+    { name: '# cameras installed', type: 'progress', unit: '-' },
+    { name: '# sites identified for ICCC', type: 'readiness', unit: '-' },
+  ], ['Delhi', 'Gurugram', 'Noida']),
+
+  'cems-apcd': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: '# industries with CEMS installed', type: 'outcome', unit: 'industries' },
+    { name: '# industries with APCDs installed', type: 'outcome', unit: 'industries' },
+    { name: '# industries identified for CEMS/APCD', type: 'progress', unit: '-' },
+    { name: '# show-cause notices issued', type: 'progress', unit: '-' },
+  ], ['Delhi', 'Noida', 'Greater Noida', 'Ghaziabad']),
+
+  'road-repair': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: 'Km road-length repaired', type: 'outcome', unit: 'km' },
+    { name: 'No. of roads identified for repair', type: 'progress', unit: '-' },
+    { name: 'No. of roads surveyed', type: 'readiness', unit: '-' },
+  ], ['Delhi', 'Gurugram', 'Rohtak', 'Panipat']),
+
+  'green-cess': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: '# tolls with cess collection initiated', type: 'outcome', unit: 'tolls' },
+    { name: 'Cess amount collected', type: 'outcome', unit: 'INR Cr' },
+    { name: '# tolls identified for cess', type: 'progress', unit: '-' },
+  ], ['Delhi', 'Gurugram', 'Panipat', 'Alwar']),
+
+  'cd-scc': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: 'No. of SCC setup achieved', type: 'outcome', unit: '-' },
+    { name: 'Total quantum of malba received at SCC', type: 'outcome', unit: 'MMT', hasDates: true },
+    { name: 'No. of SCC identified (land parcels earmarked)', type: 'progress', unit: '-' },
+    { name: 'No. of SCC required', type: 'readiness', unit: '-' },
+  ], ['Delhi', 'Noida', 'Gurugram']),
+
+  'greening': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: 'Phase 1 greening action plan zones completed', type: 'outcome', unit: 'zones' },
+    { name: 'No. of saplings planted', type: 'outcome', unit: '-' },
+    { name: 'No. of zones identified', type: 'progress', unit: '-' },
+  ], ['Delhi', 'Noida', 'Gurugram', 'Rohtak', 'Neemrana']),
+
+  'mrs': makeUploadRows(ALL_CITIES_ORDERED, [
+    { name: 'Route coverage achieved', type: 'outcome', unit: 'routes' },
+    { name: 'MRS: Road coverage', type: 'outcome', unit: 'km', hasDates: true },
+    { name: 'No. of vehicles deployed', type: 'progress', unit: '-' },
+    { name: 'No. of routes planned', type: 'readiness', unit: '-' },
+  ], ['Delhi', 'Noida', 'Gurugram', 'Greater Noida', 'Rohtak']),
+};
+
+// Legacy flat export
+export const MOCK_UPLOAD_ROWS: UploadRow[] = MOCK_UPLOAD_BY_INITIATIVE['cd-scc'];
+
+// ─── Initiative names for upload page dropdown ──────────────────────────
+
+export const UPLOAD_INITIATIVE_SLUG_MAP: Record<string, string> = {
+  'Naya Safar Yojana': 'naya-safar-yojana',
+  'C&D - ICCC': 'cd-iccc',
+  'CEMS/APCD Installation': 'cems-apcd',
+  'Road Repair': 'road-repair',
+  'Green Cess': 'green-cess',
+  'C&D - SCC': 'cd-scc',
+  'Greening': 'greening',
+  'MRS': 'mrs',
+};
 
 export const UPLOAD_STATE_OPTIONS = ['Delhi', 'Uttar Pradesh', 'Haryana', 'Rajasthan'] as const;
 

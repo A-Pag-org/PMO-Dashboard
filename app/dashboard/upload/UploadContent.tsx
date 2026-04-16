@@ -1,5 +1,5 @@
 // FILE: app/dashboard/upload/UploadContent.tsx
-// PURPOSE: Interactive upload page — filters, download/upload buttons, editable table
+// PURPOSE: Interactive upload page — per-initiative data, cascading filters, download/upload
 // DESIGN REF: Wireframe pages 11–12 (Manual Data Upload + Excel Template)
 
 'use client';
@@ -10,24 +10,38 @@ import FilterPill from '@/components/ui/FilterPill';
 import EditableDataTable from '@/components/ui/EditableDataTable';
 import ExcelTemplatePreview from '@/components/ui/ExcelTemplatePreview';
 import {
-  UPLOAD_INITIATIVE_OPTIONS,
   UPLOAD_STATE_OPTIONS,
   UPLOAD_CITY_OPTIONS_BY_STATE,
-  MOCK_UPLOAD_ROWS,
+  UPLOAD_INITIATIVE_SLUG_MAP,
+  MOCK_UPLOAD_BY_INITIATIVE,
 } from '@/lib/constants';
 import type { UploadRow } from '@/lib/types';
 
 type UploadStatus = 'idle' | 'success' | 'error';
 
+const INITIATIVE_NAMES = Object.keys(UPLOAD_INITIATIVE_SLUG_MAP);
+
 export default function UploadContent() {
-  const [initiative, setInitiative] = useState<string>(UPLOAD_INITIATIVE_OPTIONS[4]);
-  const [state, setState] = useState<string>('Uttar Pradesh');
+  const [initiative, setInitiative] = useState(INITIATIVE_NAMES[0]);
+  const [state, setState] = useState<string>('All');
   const [city, setCity] = useState<string>('All');
-  const [rows, setRows] = useState<UploadRow[]>(MOCK_UPLOAD_ROWS);
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const initiativeOptions = [...UPLOAD_INITIATIVE_OPTIONS];
+  const slug = UPLOAD_INITIATIVE_SLUG_MAP[initiative] ?? 'naya-safar-yojana';
+
+  const [rowsByInitiative, setRowsByInitiative] = useState<Record<string, UploadRow[]>>(
+    () => {
+      const copy: Record<string, UploadRow[]> = {};
+      for (const [key, rows] of Object.entries(MOCK_UPLOAD_BY_INITIATIVE)) {
+        copy[key] = rows.map((r) => ({ ...r }));
+      }
+      return copy;
+    }
+  );
+
+  const allRows = rowsByInitiative[slug] ?? [];
+
   const stateOptions = ['All', ...UPLOAD_STATE_OPTIONS];
 
   const cityOptions = useMemo(() => {
@@ -39,7 +53,7 @@ export default function UploadContent() {
   }, [state]);
 
   const filteredRows = useMemo(() => {
-    let filtered = rows;
+    let filtered = allRows;
     if (city !== 'All') {
       filtered = filtered.filter((r) => r.geography === city);
     } else if (state !== 'All') {
@@ -47,7 +61,7 @@ export default function UploadContent() {
       filtered = filtered.filter((r) => stateCities.includes(r.geography));
     }
     return filtered;
-  }, [rows, state, city]);
+  }, [allRows, state, city]);
 
   function handleStateChange(v: string) {
     setState(v);
@@ -56,13 +70,14 @@ export default function UploadContent() {
 
   function handleNewValChange(filteredIndex: number, value: string) {
     const targetRow = filteredRows[filteredIndex];
-    setRows((prev) =>
-      prev.map((r) =>
+    setRowsByInitiative((prev) => ({
+      ...prev,
+      [slug]: prev[slug].map((r) =>
         r.geography === targetRow.geography && r.metric === targetRow.metric
           ? { ...r, newVal: value }
           : r,
       ),
-    );
+    }));
   }
 
   function handleDownload() {
@@ -82,7 +97,7 @@ export default function UploadContent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `upload-template-${initiative.replace(/\s+/g, '-').toLowerCase()}.csv`;
+    a.download = `upload-template-${slug}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -95,14 +110,10 @@ export default function UploadContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validTypes = [
-      'text/csv',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-    ];
-
-    if (!validTypes.includes(file.type) && !file.name.endsWith('.csv') && !file.name.endsWith('.xlsx')) {
+    if (!file.name.endsWith('.csv') && !file.name.endsWith('.xlsx')) {
       setUploadStatus('error');
+      setTimeout(() => setUploadStatus('idle'), 4000);
+      e.target.value = '';
       return;
     }
 
@@ -119,10 +130,11 @@ export default function UploadContent() {
         <div className="flex flex-wrap items-center gap-2">
           <FilterPill
             label="Initiative"
-            options={initiativeOptions}
+            options={INITIATIVE_NAMES}
             value={initiative}
             onChange={setInitiative}
           />
+          <div className="mx-1 h-6 w-px bg-white/20" />
           <FilterPill
             label="State"
             options={stateOptions as unknown as string[]}
@@ -165,7 +177,7 @@ export default function UploadContent() {
         </div>
       </div>
 
-      {/* Upload status message */}
+      {/* Upload status */}
       {uploadStatus !== 'idle' && (
         <div
           className={
@@ -175,15 +187,9 @@ export default function UploadContent() {
           }
         >
           {uploadStatus === 'success' ? (
-            <>
-              <CheckCircle className="h-4 w-4" />
-              File uploaded successfully. Data will be validated and updated.
-            </>
+            <><CheckCircle className="h-4 w-4" /> File uploaded successfully. Data will be validated and updated.</>
           ) : (
-            <>
-              <AlertCircle className="h-4 w-4" />
-              Invalid file format. Please upload a .csv or .xlsx file.
-            </>
+            <><AlertCircle className="h-4 w-4" /> Invalid file format. Please upload a .csv or .xlsx file.</>
           )}
         </div>
       )}
