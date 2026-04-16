@@ -3,16 +3,14 @@
 // DESIGN REF: Wireframe pages 9–10 of 13 (Detailed View 1/2 + 2/2)
 
 import TopBar from '@/components/layout/TopBar';
-import BottomBar from '@/components/layout/BottomBar';
 import { INITIATIVES } from '@/lib/constants';
 import DetailContent from './DetailContent';
 
 export default function DetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <TopBar title="DETAILED VIEW" showBackLink />
+      <TopBar activePage="detail" />
       <DetailContent initiatives={INITIATIVES} />
-      <BottomBar showDetailedView={false} showManualData />
     </div>
   );
 }

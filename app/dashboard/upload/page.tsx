@@ -8,7 +8,7 @@ import UploadContent from './UploadContent';
 export default function UploadPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <TopBar title="MANUAL DATA UPLOAD SCREEN" showBackLink />
+      <TopBar activePage="upload" />
       <UploadContent />
     </div>
   );
