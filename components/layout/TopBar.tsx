@@ -33,9 +33,6 @@ export default function TopBar({ activePage, className }: TopBarProps) {
           <span className="flex h-7 w-7 items-center justify-center rounded bg-[var(--color-accent)]">
             <Home className="h-4 w-4 text-[var(--color-ink)]" />
           </span>
-          <span className="text-sm font-bold text-white">
-            A-PAG <span className="font-normal text-[var(--color-accent)]">Impact Dashboard</span>
-          </span>
         </Link>
         <DashboardSwitcher />
       </div>
