@@ -181,7 +181,7 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
             />
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center px-3">
-            <div className="h-full w-full max-h-[280px] max-w-[360px]">
+            <div className="h-full w-full max-h-[560px] max-w-[720px]">
               <DelhiNCRMap
                 data={viewLevel === 'state' ? (summaryData?.map ?? []) : filteredMapData}
                 centerBubble={summaryData?.center ?? MOCK_DETAIL_CENTER_BUBBLE}
