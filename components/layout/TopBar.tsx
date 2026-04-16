@@ -1,5 +1,5 @@
 // FILE: components/layout/TopBar.tsx
-// PURPOSE: Persistent top bar with back link, page title badge, and dashboard switchers
+// PURPOSE: Persistent top bar with back link, highlighted page title badge, dashboard switchers
 // DESIGN REF: Wireframe pages 7–11 (top bar present on all dashboard pages)
 
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default function TopBar({
   return (
     <header
       className={cn(
-        'flex items-center justify-between bg-[var(--color-navy)] px-6 py-3',
+        'flex shrink-0 items-center justify-between bg-[var(--color-navy)] px-6 py-2',
         className,
       )}
     >
@@ -55,7 +55,8 @@ export default function TopBar({
         )}
       </div>
 
-      <span className="rounded-full bg-[var(--color-navy-mid)] px-5 py-1.5 text-sm font-semibold text-[var(--color-text-white)]">
+      {/* Active page title — highlighted with bright bg + border */}
+      <span className="rounded-full border border-[var(--color-blue-light)] bg-[var(--color-blue-panel)] px-5 py-1.5 text-xs font-bold tracking-wide text-white shadow-sm">
         {title}
       </span>
 
