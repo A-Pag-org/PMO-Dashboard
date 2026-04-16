@@ -1,5 +1,5 @@
 // FILE: components/ui/InitiativeCard.tsx
-// PURPOSE: KPI card for summary page left panel — initiative name, progress, bar, metric label
+// PURPOSE: KPI card for summary page left panel — compact design to fit viewport
 // DESIGN REF: Wireframe pages 7–8 (8 initiative cards in 2×4 grid)
 
 'use client';
@@ -30,39 +30,34 @@ export default function InitiativeCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'group relative flex w-full flex-col rounded-lg border p-4 text-left transition-all',
+        'group relative flex w-full flex-col rounded-md border px-3 py-2 text-left transition-all',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
         selected
           ? 'border-[var(--color-border-blue)] bg-white shadow-md'
           : 'border-[var(--color-border)] bg-[var(--color-surface-light)] hover:bg-white hover:shadow-sm',
       )}
     >
-      {/* Initiative name */}
-      <h3 className="text-sm font-semibold text-[var(--color-blue-link)]">
+      <h3 className="text-xs font-semibold leading-tight text-[var(--color-blue-link)]">
         {initiative.name}
       </h3>
 
-      {/* Progress fraction + percentage */}
-      <p className="mt-2 text-lg font-bold text-[var(--color-text-primary)]">
+      <p className="mt-1 text-sm font-bold text-[var(--color-text-primary)]">
         {primary
           ? `${formatNumber(primary.achieved)}/${formatNumber(primary.target)} (${pct}%)`
           : '—'}
       </p>
 
-      {/* Completion bar */}
-      <div className="mt-2">
+      <div className="mt-1">
         <CompletionBar value={pct} size="sm" />
       </div>
 
-      {/* Primary metric sub-label */}
-      <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
+      <p className="mt-1 text-2xs leading-tight text-[var(--color-text-secondary)]" style={{ fontSize: '10px', lineHeight: '14px' }}>
         {initiative.primaryMetric}
       </p>
 
-      {/* Drill-down icon */}
-      <div className="absolute bottom-3 right-3">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-blue-pale)] text-[var(--color-blue-link)] transition-colors group-hover:bg-[var(--color-blue-link)] group-hover:text-white">
-          <Info className="h-3.5 w-3.5" />
+      <div className="absolute bottom-2 right-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-blue-pale)] text-[var(--color-blue-link)] transition-colors group-hover:bg-[var(--color-blue-link)] group-hover:text-white">
+          <Info className="h-3 w-3" />
         </span>
       </div>
     </button>

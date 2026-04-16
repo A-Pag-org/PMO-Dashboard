@@ -1,5 +1,5 @@
 // FILE: components/layout/BottomBar.tsx
-// PURPOSE: Bottom action bar with "Detailed view" and "Enter manual data field" buttons
+// PURPOSE: Bottom action bar — compact to save vertical space
 // DESIGN REF: Wireframe pages 7–8 (summary bottom), page 10 (detail bottom)
 
 import Link from 'next/link';
@@ -20,7 +20,7 @@ export default function BottomBar({
   return (
     <footer
       className={cn(
-        'flex items-center justify-between border-t border-[var(--color-border)] bg-white px-6 py-4',
+        'flex shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-white px-6 py-2',
         className,
       )}
     >
@@ -28,14 +28,14 @@ export default function BottomBar({
         <Link
           href="/dashboard/detail"
           className={cn(
-            'flex min-h-[44px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-5 py-2 text-sm font-medium text-[var(--color-text-white)] transition-colors',
+            'flex min-h-[36px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors',
             'hover:bg-[var(--color-navy-mid)]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
           )}
         >
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-3.5 w-3.5" />
           <span>Detailed view</span>
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="h-3.5 w-3.5" />
         </Link>
       ) : (
         <div />
@@ -45,14 +45,14 @@ export default function BottomBar({
         <Link
           href="/dashboard/upload"
           className={cn(
-            'flex min-h-[44px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-5 py-2 text-sm font-medium text-[var(--color-text-white)] transition-colors',
+            'flex min-h-[36px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors',
             'hover:bg-[var(--color-navy-mid)]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
           )}
         >
-          <FileSpreadsheet className="h-4 w-4" />
+          <FileSpreadsheet className="h-3.5 w-3.5" />
           <span>Enter manual data field</span>
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="h-3.5 w-3.5" />
         </Link>
       )}
     </footer>
