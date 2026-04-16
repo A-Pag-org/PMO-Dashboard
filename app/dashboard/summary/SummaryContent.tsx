@@ -49,7 +49,7 @@ export default function SummaryContent({ initiatives }: SummaryContentProps) {
     <main className="flex min-h-0 flex-1">
       {/* ── LEFT PANEL — Initiative Cards (≈38%) ── */}
       <div className="flex w-[38%] shrink-0 flex-col border-r border-[var(--color-divider-dashed)] p-2">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid h-full grid-cols-2 grid-rows-4 gap-2">
           {initiatives.map((init, i) => (
             <InitiativeCard
               key={init.slug}
