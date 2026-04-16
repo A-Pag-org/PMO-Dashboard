@@ -273,18 +273,47 @@ export const MOCK_SUMMARY_TABLE: SummaryTableRow[] = MOCK_SUMMARY_BY_INITIATIVE[
 export const MOCK_SUMMARY_MAP_DATA: MapDataPoint[] = MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'].map;
 export const MOCK_SUMMARY_CENTER_BUBBLE: MapCenterBubble = MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'].center;
 
+// ─── City-to-State Mapping (used for cascading filters) ─────────────────
+
+export const CITY_STATE_MAP: Record<string, string> = {
+  'Delhi':        'Delhi',
+  'Noida':        'Uttar Pradesh',
+  'Greater Noida':'Uttar Pradesh',
+  'Ghaziabad':    'Uttar Pradesh',
+  'Gurugram':     'Haryana',
+  'Rohtak':       'Haryana',
+  'Panipat':      'Haryana',
+  'Neemrana':     'Rajasthan',
+  'Alwar':        'Rajasthan',
+};
+
+// ─── RTO Options per City ───────────────────────────────────────────────
+
+export const RTO_OPTIONS_BY_CITY: Record<string, string[]> = {
+  'Delhi':        ['Delhi Central', 'Delhi South', 'Delhi East', 'Delhi West'],
+  'Noida':        ['Noida RTO', 'Noida Sector-20 RTO'],
+  'Greater Noida':['Greater Noida RTO'],
+  'Ghaziabad':    ['Ghaziabad RTO'],
+  'Gurugram':     ['Gurugram RTO', 'Gurugram Sector-14 RTO'],
+  'Rohtak':       ['Rohtak RTO'],
+  'Panipat':      ['Panipat RTO'],
+  'Neemrana':     ['Neemrana RTO'],
+  'Alwar':        ['Alwar RTO'],
+};
+
 // ─── Mock Data: Detail Page Map — City Level (wireframe page 9) ────────
 // TODO: replace with API call
 
 export const MOCK_DETAIL_MAP_DATA: MapDataPoint[] = [
-  { name: 'Panipat',       value: 2800, onTrack: true },
-  { name: 'Rohtak',        value: 2800, onTrack: true },
   { name: 'Delhi',         value: 2200, onTrack: true },
-  { name: 'Gurugram',      value: 3500, onTrack: true },
-  { name: 'Alwar',         value: 1200, onTrack: true },
-  { name: 'Meerut',        value: 1100, onTrack: true },
   { name: 'Noida',         value: 800,  onTrack: false },
   { name: 'Greater Noida', value: 700,  onTrack: false },
+  { name: 'Ghaziabad',     value: 650,  onTrack: false },
+  { name: 'Gurugram',      value: 3500, onTrack: true },
+  { name: 'Rohtak',        value: 2800, onTrack: true },
+  { name: 'Panipat',       value: 2800, onTrack: true },
+  { name: 'Neemrana',      value: 1200, onTrack: true },
+  { name: 'Alwar',         value: 900,  onTrack: true },
 ];
 
 export const MOCK_DETAIL_CENTER_BUBBLE: MapCenterBubble = {
@@ -293,15 +322,23 @@ export const MOCK_DETAIL_CENTER_BUBBLE: MapCenterBubble = {
   subtitle: '76,496 / 1,91,239 trucks',
 };
 
-// ─── Mock Data: Detail Page Tables (wireframe page 10) ─────────────────
+// ─── Mock Data: Detail Page Tables — per city (wireframe page 10) ──────
 // TODO: replace with API call
 
-export const MOCK_DETAIL_TABLE: DetailTableRow[] = [
-  { geography: 'Delhi',    target: 3200, achieved: 2240, completion: 70 },
-  { geography: 'Noida',    target: 2000, achieved: 500,  completion: 40 },
-  { geography: 'Gurugram', target: 2500, achieved: 500,  completion: 20 },
-  { geography: 'Neemrana', target: 1500, achieved: 750,  completion: 50 },
+export const MOCK_DETAIL_TABLE_ALL: DetailTableRow[] = [
+  { geography: 'Delhi',         target: 3200, achieved: 2240, completion: 70 },
+  { geography: 'Noida',         target: 2000, achieved: 500,  completion: 25 },
+  { geography: 'Greater Noida', target: 1800, achieved: 360,  completion: 20 },
+  { geography: 'Ghaziabad',     target: 1500, achieved: 225,  completion: 15 },
+  { geography: 'Gurugram',      target: 2500, achieved: 1750, completion: 70 },
+  { geography: 'Rohtak',        target: 1200, achieved: 600,  completion: 50 },
+  { geography: 'Panipat',       target: 1000, achieved: 450,  completion: 45 },
+  { geography: 'Neemrana',      target: 800,  achieved: 320,  completion: 40 },
+  { geography: 'Alwar',         target: 600,  achieved: 180,  completion: 30 },
 ];
+
+// Legacy alias
+export const MOCK_DETAIL_TABLE = MOCK_DETAIL_TABLE_ALL;
 
 // ─── Mock Data: Upload Page Rows (wireframe page 11) ───────────────────
 // TODO: replace with API call
