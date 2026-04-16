@@ -1,9 +1,11 @@
 // FILE: app/dashboard/summary/page.tsx
-// PURPOSE: Summary page — uses shared layout components, content coming in next block
-// DESIGN REF: Wireframe pages 7–8 of 13
+// PURPOSE: Summary page — initiative cards (left), map/table toggle (right), bottom bar
+// DESIGN REF: Wireframe pages 7–8 of 13 (Summary Page 1/2 + 2/2)
 
 import TopBar from '@/components/layout/TopBar';
 import BottomBar from '@/components/layout/BottomBar';
+import { INITIATIVES } from '@/lib/constants';
+import SummaryContent from './SummaryContent';
 
 export default function SummaryPage() {
   return (
@@ -16,11 +18,7 @@ export default function SummaryPage() {
         </h1>
       </div>
 
-      <main className="flex flex-1 items-center justify-center p-8">
-        <p className="text-lg text-[var(--color-text-muted)]">
-          Summary page content (initiative cards, map, and table) — coming next.
-        </p>
-      </main>
+      <SummaryContent initiatives={INITIATIVES} />
 
       <BottomBar showDetailedView showManualData />
     </div>
