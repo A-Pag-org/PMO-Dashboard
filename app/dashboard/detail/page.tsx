@@ -1,21 +1,17 @@
 // FILE: app/dashboard/detail/page.tsx
-// PURPOSE: Detailed view page — uses shared layout components, content coming in a future block
-// DESIGN REF: Wireframe pages 9–10 of 13
+// PURPOSE: Detailed view — filters, map + metrics (top), dual data tables (bottom)
+// DESIGN REF: Wireframe pages 9–10 of 13 (Detailed View 1/2 + 2/2)
 
 import TopBar from '@/components/layout/TopBar';
 import BottomBar from '@/components/layout/BottomBar';
+import { INITIATIVES } from '@/lib/constants';
+import DetailContent from './DetailContent';
 
 export default function DetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <TopBar title="DETAILED VIEW" showBackLink />
-
-      <main className="flex flex-1 items-center justify-center p-8">
-        <p className="text-lg text-[var(--color-text-muted)]">
-          Detailed view content (filters, map, metrics, data tables) — coming soon.
-        </p>
-      </main>
-
+      <DetailContent initiatives={INITIATIVES} />
       <BottomBar showDetailedView={false} showManualData />
     </div>
   );
