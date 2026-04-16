@@ -38,21 +38,21 @@ const REGION_PATHS = {
 } as const;
 
 const STATE_BUBBLE_POSITIONS: Record<string, { x: number; y: number }> = {
-  Haryana:          { x: 80,  y: 120 },
-  'Uttar Pradesh':  { x: 290, y: 140 },
-  Delhi:            { x: 185, y: 130 },
-  Rajasthan:        { x: 90,  y: 280 },
-  Panipat:          { x: 140, y: 35 },
-  Rohtak:           { x: 55,  y: 100 },
-  Gurugram:         { x: 120, y: 175 },
-  Alwar:            { x: 60,  y: 270 },
-  Meerut:           { x: 300, y: 60 },
-  Noida:            { x: 250, y: 185 },
-  'Greater Noida':  { x: 280, y: 225 },
-  Ghaziabad:        { x: 260, y: 100 },
+  Haryana:          { x: 65,  y: 100 },
+  'Uttar Pradesh':  { x: 310, y: 130 },
+  Delhi:            { x: 175, y: 75 },
+  Rajasthan:        { x: 75,  y: 290 },
+  Panipat:          { x: 140, y: 30 },
+  Rohtak:           { x: 40,  y: 140 },
+  Gurugram:         { x: 100, y: 200 },
+  Alwar:            { x: 45,  y: 270 },
+  Meerut:           { x: 315, y: 55 },
+  Noida:            { x: 265, y: 200 },
+  'Greater Noida':  { x: 300, y: 245 },
+  Ghaziabad:        { x: 275, y: 85 },
 };
 
-const CENTER = { x: 190, y: 170 };
+const CENTER = { x: 185, y: 165 };
 
 const bubbleVariants = {
   hidden: { scale: 0.8, opacity: 0 },
@@ -106,30 +106,10 @@ export default function DelhiNCRMap({
         </g>
       ))}
 
-      {/* ── Data bubbles ── */}
-      {data.map((point, i) => {
-        const pos = STATE_BUBBLE_POSITIONS[point.name];
-        if (!pos) return null;
-
-        return (
-          <motion.g
-            key={point.name}
-            custom={i}
-            variants={bubbleVariants}
-            initial={shouldReduceMotion ? 'visible' : 'hidden'}
-            animate="visible"
-            onClick={() => onBubbleClick?.(point.name)}
-            className="cursor-pointer"
-          >
-            <CityBubble data={point} x={pos.x} y={pos.y} />
-          </motion.g>
-        );
-      })}
-
-      {/* ── Center bubble ── */}
+      {/* ── Center bubble (rendered first so city bubbles appear on top) ── */}
       <motion.g
         variants={bubbleVariants}
-        custom={data.length}
+        custom={0}
         initial={shouldReduceMotion ? 'visible' : 'hidden'}
         animate="visible"
       >
@@ -142,6 +122,26 @@ export default function DelhiNCRMap({
           centerSubtitle={centerBubble.subtitle}
         />
       </motion.g>
+
+      {/* ── Data bubbles (on top of center bubble) ── */}
+      {data.map((point, i) => {
+        const pos = STATE_BUBBLE_POSITIONS[point.name];
+        if (!pos) return null;
+
+        return (
+          <motion.g
+            key={point.name}
+            custom={i + 1}
+            variants={bubbleVariants}
+            initial={shouldReduceMotion ? 'visible' : 'hidden'}
+            animate="visible"
+            onClick={() => onBubbleClick?.(point.name)}
+            className="cursor-pointer"
+          >
+            <CityBubble data={point} x={pos.x} y={pos.y} />
+          </motion.g>
+        );
+      })}
     </svg>
   );
 }
