@@ -1,19 +1,17 @@
 // FILE: app/dashboard/summary/SummaryContent.tsx
-// PURPOSE: Interactive content area for summary page — initiative selection, map/table toggle
+// PURPOSE: Interactive content area — initiative selection drives map/table data
 // DESIGN REF: Wireframe pages 7–8 (left panel cards + right panel map/table)
+// Wireframe annotation: "Map / table changes with initiative selected"
 
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import InitiativeCard from '@/components/ui/InitiativeCard';
 import ViewToggle from '@/components/ui/ViewToggle';
 import DelhiNCRMap from '@/components/maps/DelhiNCRMap';
 import DataTable from '@/components/ui/DataTable';
-import {
-  MOCK_SUMMARY_MAP_DATA,
-  MOCK_SUMMARY_CENTER_BUBBLE,
-  MOCK_SUMMARY_TABLE,
-} from '@/lib/constants';
+import { MOCK_SUMMARY_BY_INITIATIVE } from '@/lib/constants';
 import type { Initiative } from '@/lib/types';
 
 const VIEW_OPTIONS = ['Map', 'Table'] as const;
@@ -23,14 +21,24 @@ interface SummaryContentProps {
   initiatives: Initiative[];
 }
 
+const fadeVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+};
+
 export default function SummaryContent({ initiatives }: SummaryContentProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('Map');
+  const shouldReduceMotion = useReducedMotion();
 
   const selected = initiatives[selectedIndex];
 
-  // TODO: replace with API call — map/table data should change per initiative
-  const tableRows = MOCK_SUMMARY_TABLE.map((r) => ({
+  // TODO: replace with API call — currently uses per-initiative mock data
+  const summaryData = MOCK_SUMMARY_BY_INITIATIVE[selected.slug] ??
+    MOCK_SUMMARY_BY_INITIATIVE['naya-safar-yojana'];
+
+  const tableRows = summaryData.table.map((r) => ({
     label: r.state,
     target: r.target,
     achieved: r.achieved,
@@ -40,7 +48,7 @@ export default function SummaryContent({ initiatives }: SummaryContentProps) {
   return (
     <main className="flex flex-1 gap-0">
       {/* ── LEFT PANEL — Initiative Cards (≈40%) ── */}
-      <div className="w-[40%] shrink-0 border-r border-[var(--color-divider-dashed)] p-4">
+      <div className="w-[40%] shrink-0 overflow-y-auto border-r border-[var(--color-divider-dashed)] p-4">
         <div className="grid grid-cols-2 gap-3">
           {initiatives.map((init, i) => (
             <InitiativeCard
@@ -57,11 +65,11 @@ export default function SummaryContent({ initiatives }: SummaryContentProps) {
       <div className="flex flex-1 flex-col">
         {/* Initiative title banner + view toggle */}
         <div className="flex items-center justify-between bg-[var(--color-navy)] px-5 py-3">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--color-text-white)]">
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-base font-semibold text-[var(--color-text-white)]">
               {selected.name}
             </h2>
-            <p className="mt-0.5 text-xs text-[var(--color-blue-light)]">
+            <p className="mt-0.5 truncate text-xs text-[var(--color-blue-light)]">
               {selected.primaryMetric}
             </p>
           </div>
@@ -72,24 +80,33 @@ export default function SummaryContent({ initiatives }: SummaryContentProps) {
           />
         </div>
 
-        {/* Content area */}
-        <div className="flex flex-1 items-center justify-center p-5">
-          {viewMode === 'Map' ? (
-            <div className="h-full w-full max-h-[420px] max-w-[500px]">
-              <DelhiNCRMap
-                data={MOCK_SUMMARY_MAP_DATA}
-                centerBubble={MOCK_SUMMARY_CENTER_BUBBLE}
-              />
-            </div>
-          ) : (
-            <div className="w-full">
-              <DataTable
-                title={selected.primaryMetric}
-                geographyLabel="State"
-                rows={tableRows}
-              />
-            </div>
-          )}
+        {/* Content area — animates on initiative or view change */}
+        <div className="flex flex-1 items-start justify-center overflow-y-auto p-5">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${selected.slug}-${viewMode}`}
+              variants={shouldReduceMotion ? undefined : fadeVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              {viewMode === 'Map' ? (
+                <div className="mx-auto max-h-[420px] max-w-[500px]">
+                  <DelhiNCRMap
+                    data={summaryData.map}
+                    centerBubble={summaryData.center}
+                  />
+                </div>
+              ) : (
+                <DataTable
+                  title={selected.primaryMetric}
+                  geographyLabel="State"
+                  rows={tableRows}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </main>
