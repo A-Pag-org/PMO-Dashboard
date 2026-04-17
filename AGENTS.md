@@ -38,25 +38,31 @@
 
 ## 3. Design Files
 
-Two design files are the source of truth:
+Three design files are the source of truth:
 
-1. **`Impact_Dashboard_Wireframes_15_Apr.pdf`** — primary wireframes (13 pages, April 2026)
-2. **`vaqct_slide.svg`** — V-AQcT colour palette reference (**not yet uploaded; colour tokens below are from the textual specification and must be verified against the SVG once available**)
+1. **`Impact_Dashboard_Wireframes_15_Apr.pdf`** — detailed component wireframes (13 pages, April 2026)
+2. **`Impact_Dashboard_Structure_16_Apr.pdf`** — updated user flow and page structure (13 pages, April 2026)
+3. **`vaqct_slide.svg`** — V-AQcT colour palette reference (**not yet uploaded; colour tokens below are from the textual specification and must be verified against the SVG once available**)
 
-### Page Map (PDF → Application Route)
+### Source Priority
+
+- If the two PDFs differ, **`Impact_Dashboard_Structure_16_Apr.pdf` wins for flow/page structure and navigation**.
+- Use **`Impact_Dashboard_Wireframes_15_Apr.pdf` for component-level UI detail** (spacing, controls, table structures, annotations) where not overridden.
+
+### Page Map (Structure PDF → Application Route)
 
 | PDF Page | Wireframe Title | Application Route |
 |----------|----------------|-------------------|
 | 1 of 13 | Title page: "Wireframes for Impact Dashboard" | — |
-| 2 of 13 | Impact dashboard flow (1/3) — full flow diagram | — (reference only) |
-| 3 of 13 | Impact dashboard flow (2/3) — Login → Home | — (reference only) |
-| 4 of 13 | Impact dashboard flow (3/3) — Summary → Detail → Upload | — (reference only) |
+| 2 of 13 | Impact dashboard flow (1/3) | — (reference only) |
+| 3 of 13 | Impact dashboard flow (2/3) | — (reference only) |
+| 4 of 13 | Impact dashboard flow (3/3) | — (reference only) |
 | 5 of 13 | Log-in page | `/login` |
 | 6 of 13 | Dashboard selection | `/home` |
-| 7 of 13 | Summary Page (1/2) — initiative cards + map view | `/dashboard/summary` |
-| 8 of 13 | Summary Page (2/2) — initiative cards + table view | `/dashboard/summary` |
-| 9 of 13 | Detailed View (1/2) — map + metrics panels | `/dashboard/detail` |
-| 10 of 13 | Detailed View (2/2) — data tables | `/dashboard/detail` |
+| 7 of 13 | Summary page | `/dashboard/summary` |
+| 8 of 13 | Detailed View (1/2) | `/dashboard/detail` |
+| 9 of 13 | Detailed View (2/2) | `/dashboard/detail` |
+| 10 of 13 | All Data View | `/dashboard/all-data` |
 | 11 of 13 | Manual Data Upload Screen | `/dashboard/upload` |
 | 12 of 13 | Excel Upload Template (preview) | `/dashboard/upload` |
 | 13 of 13 | Thank you | — |
@@ -91,12 +97,19 @@ Derived from wireframe pages 2–4 (flow diagrams 1/3, 2/3, 3/3).
          ┌────────────────────┐              │         ┌────────────────────────┐
          │  DETAILED VIEW     │              │         │  MANUAL DATA UPLOAD    │
          │  /dashboard/detail │──────────────┘         │  /dashboard/upload     │
-         └────────────────────┘                        └────────────────────────┘
+         └──────────┬─────────┘                        └────────────────────────┘
+                    │
+                    ▼
+          ┌──────────────────────┐
+          │     ALL DATA VIEW    │
+          │ /dashboard/all-data  │
+          └──────────────────────┘
 ```
 
 **Cross-dashboard navigation** (from wireframe annotation):
 - "Integration across dashboards will be needed"
-- PMO Dashboard and AQI Dashboard switchers are accessible from every dashboard page via the TopBar
+- Action-Plan Dashboard switcher is accessible from every dashboard page via the TopBar
+- AQI dashboard is planned for later-stage integration
 - All dashboard pages have a "Back to Summary page" link
 
 **Key navigation rules:**
@@ -104,7 +117,10 @@ Derived from wireframe pages 2–4 (flow diagrams 1/3, 2/3, 3/3).
 - Home: clicking IMPACT DASHBOARD card → `/dashboard/summary`
 - Summary: "Detailed view" button (bottom-left) → `/dashboard/detail`
 - Summary: "Enter manual data field" button (bottom-right) → `/dashboard/upload`
+- Detail: "See all data" button/link → `/dashboard/all-data`
 - Detail: "Enter manual data field" button (bottom-right) → `/dashboard/upload`
+- All Data: "Back to map" link → `/dashboard/detail`
+- All Data: "Enter manual data field" button (bottom-right) → `/dashboard/upload`
 - Detail: "Back to Summary page" link (top-left) → `/dashboard/summary`
 - Upload: "Back to Summary page" link (top-left) → `/dashboard/summary`
 
@@ -123,18 +139,18 @@ Derived from wireframe pages 2–4 (flow diagrams 1/3, 2/3, 3/3).
   - Password input — show/hide toggle (eye icon, Lucide)
   - "Sign In" CTA — dark green (`--color-success` / `#2D6A4F`), full width, white text
   - **"Illustrative"** badge top-right corner (slate/grey pill)
-- **Wireframe callout:** "Common log-in for all dashboards, i.e., PMO, Impact, and AQI monitoring)"
+- **Wireframe callout (structure update):** "Common log-in for both dashboards, i.e., Action-Plan & Impact"
 - **On success →** route to `/home`
 
 ### PAGE 2 — `/home` (Wireframe: page 6 of 13)
 
-**Layout:** Blue gradient header + 3-column card grid
+**Layout:** Blue gradient header + 2-column card grid (AQI appears later)
 
 - Page heading: "Dashboard selection" (white, left-aligned, on blue header)
-- 3 selector cards:
-  - **PMO DASHBOARD** — blue label (`#4A90D9`), grey bg, subtle border
+- 2 selector cards:
+  - **ACTION-PLAN DASHBOARD** — blue label (`#4A90D9`), grey bg, subtle border
   - **IMPACT DASHBOARD** — blue label (`#4A90D9`), white bg, cyan border (active/highlighted)
-  - **AQI DASHBOARD** — orange label (`#E07B2A`), grey bg, subtle border, sub-label "(Phase 3 - TBD)"
+- **Future note:** AQI dashboard to be integrated at a later stage (per structure page 3)
 - Clicking **IMPACT DASHBOARD →** route to `/dashboard/summary`
 
 ### PAGE 3 — `/dashboard/summary` (Wireframe: pages 7–8 of 13)
@@ -143,9 +159,9 @@ Single scrollable page combining both wireframe halves (1/2 = map view, 2/2 = ta
 
 #### Top Bar (persistent across all dashboard pages)
 - Left: home icon + "Back to Summary page" link (visible on detail/upload pages; on summary page itself, this may show as home icon only)
-- Center: page title badge — **"SUMMARY PAGE (1/2)"** dark navy pill
-- Right: two dashboard switcher links — **"PMO Dashboard"** | **"AQI Dashboard"** (dark navy bg, white text, with icons)
-- Wireframe callout: "Links to other dashboards"
+- Center: page title badge — **"SUMMARY PAGE"** dark navy pill
+- Right: dashboard switcher link — **"Action-Plan Dashboard"** (dark navy bg, white text, with icon)
+- Wireframe callout: "Links to Action-Plan Dashboard"
 
 #### Main Content Header
 - **"Overall Delhi-NCR Performance"** (white text on blue header band, full width)
@@ -210,14 +226,14 @@ Each card contains:
 - Left: **"Detailed view ▼"** button (icon + label, dark navy) — wireframe callout: "Link to detailed view dashboard"
 - Right: **"Enter manual data field ▼"** button (icon + label) — wireframe callout: "Link to data entry portal"
 
-### PAGE 4 — `/dashboard/detail` (Wireframe: pages 9–10 of 13)
+### PAGE 4 — `/dashboard/detail` (Wireframe: pages 8–9 of 13)
 
 Single scrollable page — top half = map + metrics, bottom half = data tables.
 
 #### Top Bar
 - Left: **"← Back to Summary page"** (house icon, blue link)
 - Center: page title badge — **"DETAILED VIEW (1/2)"** dark navy pill
-- Right: **"PMO Dashboard"** | **"AQI Dashboard"** switcher links
+- Right: **"Action-Plan Dashboard"** switcher link
 
 #### Filter Bar (dark navy, full width)
 - Dropdown filters: **"State ▼"** | **"City ▼"** | **"RTO ▼"**
@@ -281,14 +297,37 @@ Both tables share the same structure:
 > "This is the bottom half of the same detailed view page; the Y-axis of the table will change according to the view selected above; only metrics applicable to the selected view will be shown. E.g. since 'PSBs/NBFCs onboarded' is a center-level metric, it will not appear in the table when viewing data at the state, city, or RTO level"
 
 #### Bottom Bar
+- Left: **"See all data"** button/link → `/dashboard/all-data`
 - Right: **"Enter manual data field ▼"** button
 
-### PAGE 5 — `/dashboard/upload` (Wireframe: pages 11–12 of 13)
+### PAGE 5 — `/dashboard/all-data` (Wireframe: page 10 of 13)
+
+Single scrollable page focused on full tabular visibility across metrics and geographies.
+
+#### Top Bar
+- Left: **"← Back to Summary page"**
+- Center: **"ALL DATA VIEW"** badge
+- Right: **"Action-Plan Dashboard"** switcher
+
+#### Header Controls
+- Initiative selector: **"Naya Safar Yojana ▼"**
+- Sort / filter controls for table columns
+- Link: **"Back to map"** (returns to `/dashboard/detail`)
+- CTA (right): **"Enter manual data field ▼"** (navigates to `/dashboard/upload`)
+
+#### Main Table Behavior
+- Shows all available data rows for applicable metrics in tabular format.
+- Lowest available geography depends on metric definition (state / city / RTO / central).
+- **Wireframe note:** "Different metrics will show data at different lowest levels."
+- **Wireframe note:** "Data is entered at the lowest level; aggregated to upper levels."
+- Remaining metrics continue to the right and/or below the first table block.
+
+### PAGE 6 — `/dashboard/upload` (Wireframe: pages 11–12 of 13)
 
 #### Top Bar
 - Left: **"← Back to Summary page"**
 - Center: **"MANUAL DATA UPLOAD SCREEN"** badge
-- Right: **"PMO Dashboard"** | **"AQI Dashboard"** switchers
+- Right: **"Action-Plan Dashboard"** switcher
 
 #### Filter Row (4 items, dark navy pills)
 - **"Initiative ▼"** — dropdown
@@ -473,15 +512,16 @@ app/
   (home)/
     page.tsx                   ← Dashboard selection page (wireframe page 6)
   dashboard/
-    summary/page.tsx           ← Summary page (wireframe pages 7–8 combined)
-    detail/page.tsx            ← Detailed view (wireframe pages 9–10 combined)
+    summary/page.tsx           ← Summary page (wireframe page 7)
+    detail/page.tsx            ← Detailed view (wireframe pages 8–9)
+    all-data/page.tsx          ← All Data View (wireframe page 10)
     upload/page.tsx            ← Manual data upload (wireframe pages 11–12)
 
 components/
   layout/
     TopBar.tsx                 ← Persistent top bar with back link + switchers
-    DashboardSwitcher.tsx      ← PMO / AQI dropdown switcher
-    BottomBar.tsx              ← "Detailed view" + "Enter manual data" bar
+    DashboardSwitcher.tsx      ← Action-Plan switcher (+ AQI future-ready entry)
+    BottomBar.tsx              ← Contextual CTA bar (detail / all-data / upload)
   ui/
     CompletionBar.tsx          ← Horizontal bar with threshold colour logic
     InitiativeCard.tsx         ← KPI card (summary page left panel)
@@ -489,7 +529,7 @@ components/
     ProgressMetricRow.tsx      ← Progress metric list item with icon + bar
     AverageOval.tsx            ← Delhi-NCR avg / State avg / City avg oval badge
     FilterPill.tsx             ← Dark navy dropdown filter pill
-    DashboardCard.tsx          ← Home page selector card (PMO/Impact/AQI)
+    DashboardCard.tsx          ← Home page selector card (Action-Plan/Impact/AQI-future)
     DataTable.tsx              ← Reusable table (Geography/Target/Achieved/Completion)
     EditableDataTable.tsx      ← Upload page table with editable New Val cells
     ExcelTemplatePreview.tsx   ← Locked/unlocked cell preview section
@@ -568,7 +608,7 @@ Pure SVG React component. Regions coloured by `--color-map-*` tokens. City bubbl
 7. Editable cells must be unmistakably different from read-only cells (white bg + visible border vs grey bg for locked).
 8. All numbers formatted with **Indian numeral system**: use `formatNumber()` — e.g. "1,91,239".
 9. Breadcrumb trail visible at all times showing current page context.
-10. Dashboard switcher (PMO / AQI) accessible from every page in one click.
+10. Dashboard switcher (Action-Plan now, AQI future-ready) accessible from every page in one click.
 
 ---
 
@@ -718,8 +758,9 @@ Files must be delivered in this exact sequence:
 | 25 | `app/(home)/page.tsx` | |
 | 26 | `app/dashboard/summary/page.tsx` | |
 | 27 | `app/dashboard/detail/page.tsx` | |
-| 28 | `app/dashboard/upload/page.tsx` | |
-| 29 | `middleware.ts` | |
+| 28 | `app/dashboard/all-data/page.tsx` | |
+| 29 | `app/dashboard/upload/page.tsx` | |
+| 30 | `middleware.ts` | |
 
 ### File Header Convention
 
@@ -769,7 +810,7 @@ const MOCK_DETAIL_TABLE = [
 
 ### Upload Page Table Data (wireframe page 11)
 
-See Section 5, PAGE 5 for the full row data. Key observations:
+See Section 5, PAGE 6 for the full row data. Key observations:
 - Noida has 4 metrics with data filled in
 - Greater Noida has same 4 metrics but with empty current values
 - Ghaziabad has partial data (only 2 rows shown in wireframe)
@@ -794,14 +835,17 @@ All annotations from the wireframe that describe interactive behaviour:
 |---------------|-------------|----------------|
 | 7 (Summary 1/2) | "Map / table changes with initiative selected" | Clicking an initiative card on the left updates the right panel (map/table) |
 | 7 (Summary 1/2) | "View toggle" | MAP / TABLE buttons toggle the right panel display mode |
-| 7 (Summary 1/2) | "Links to other dashboards" | PMO Dashboard / AQI Dashboard switchers in TopBar |
+| 7 (Summary 1/2) | "Links to Action-Plan Dashboard" | Action-Plan Dashboard switcher in TopBar (AQI remains future integration) |
 | 7 (Summary 1/2) | "Link to detailed view dashboard" | "Detailed view ▼" button (bottom-left) navigates to `/dashboard/detail` |
 | 7 (Summary 1/2) | "Link to data entry portal" | "Enter manual data field ▼" button (bottom-right) navigates to `/dashboard/upload` |
 | 9 (Detail 1/2) | "Filters" | State / City / RTO / Initiative dropdowns in filter bar |
 | 9 (Detail 1/2) | "View toggle" | [State] [City] [RTO] segmented control on map panel |
 | 9 (Detail 1/2) | "% completion of filtered geo" | Oval badge on map showing completion % for current filter |
 | 9 (Detail 1/2) | Hover: "See on map" | Tooltip shown when hovering city bubbles on the map |
-| 10 (Detail 2/2) | "All other metrics (previous page) on right side >>>" | Metrics from the top-half panel continue to the right of the tables |
+| 9 (Detail 2/2) | "See all data" | CTA navigates from `/dashboard/detail` to `/dashboard/all-data` |
+| 10 (All Data View) | "Back to map" | Link navigates from `/dashboard/all-data` to `/dashboard/detail` |
+| 10 (All Data View) | "Sort / filter" | All-data table supports sort and filter controls for tabular inspection |
+| 10 (All Data View) | "All other metrics continue right side >>>" | Additional metric tables continue horizontally and/or below |
 | 11 (Upload) | "User can alternatively upload excel to update data" | Upload button allows file-based data entry as alternative to manual cell editing |
 | 12 (Excel Template) | "Downloaded from the manual data upload screen" | Template file is generated from current table state |
 | 12 (Excel Template) | "Only unshaded cells are unlocked (depends on the user)" | Cell editability varies by user role/access level |
