@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Truck,
   Calendar,
@@ -60,6 +60,9 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     if (stateFilter !== 'All') return ['City', 'RTO'];
     return VIEW_LEVELS;
   }, [stateFilter, cityFilter]);
+  const effectiveViewLabel =
+    availableViewLevels.includes(viewLabel) ? viewLabel : availableViewLevels[0];
+  const effectiveViewLevel = effectiveViewLabel.toLowerCase() as ViewLevel;
 
   // Cascading filter options
   const stateOptions = ['All', ...STATES];
@@ -90,13 +93,6 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     setCityFilter(v);
     setRtoFilter('All');
   }
-
-  useEffect(() => {
-    if (!availableViewLevels.includes(viewLabel)) {
-      const next = availableViewLevels[0] ?? 'State';
-      setViewLevel(next.toLowerCase() as ViewLevel);
-    }
-  }, [availableViewLevels, viewLabel]);
 
   // Filter map data based on selections
   const filteredMapData = useMemo(() => {
@@ -177,14 +173,14 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
   }, [stateFilter, cityFilter, rtoFilter]);
 
   const displayedTableRows =
-    viewLevel === 'state'
+    effectiveViewLevel === 'state'
       ? stateTableRows
-      : viewLevel === 'city'
+      : effectiveViewLevel === 'city'
         ? filteredCityRows
         : rtoTableRows;
 
   const displayedMapData =
-    viewLevel === 'state'
+    effectiveViewLevel === 'state'
       ? summaryData?.map ?? []
       : filteredMapData;
 
@@ -258,7 +254,7 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
             </h2>
           </div>
           <div className="shrink-0 px-4 py-2">
-            <ViewToggle options={availableViewLevels} value={viewLabel} onChange={handleViewLevelChange} />
+            <ViewToggle options={availableViewLevels} value={effectiveViewLabel} onChange={handleViewLevelChange} />
           </div>
           <div className="px-4 pb-1">
             <span className="inline-flex rounded-full bg-[var(--color-surface-light)] px-3 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
@@ -278,12 +274,12 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
             <AverageOval
               label="State avg"
               value={`${stateAvg}%`}
-              visible={viewLevel === 'city' || viewLevel === 'rto'}
+              visible={effectiveViewLevel === 'city' || effectiveViewLevel === 'rto'}
             />
             <AverageOval
               label="City avg"
               value={`${cityAvg}%`}
-              visible={viewLevel === 'rto'}
+              visible={effectiveViewLevel === 'rto'}
             />
           </div>
         </div>
@@ -344,13 +340,25 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DataTable
             title={outcomeMetrics[0]?.name ?? currentInit.primaryMetric}
-            geographyLabel={viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO'}
+            geographyLabel={
+              effectiveViewLevel === 'state'
+                ? 'State'
+                : effectiveViewLevel === 'city'
+                  ? 'City'
+                  : 'RTO'
+            }
             rows={displayedTableRows}
           />
           {outcomeMetrics.length > 1 ? (
             <DataTable
               title={outcomeMetrics[1].name}
-              geographyLabel={viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO'}
+              geographyLabel={
+                effectiveViewLevel === 'state'
+                  ? 'State'
+                  : effectiveViewLevel === 'city'
+                    ? 'City'
+                    : 'RTO'
+              }
               rows={displayedTableRows}
             />
           ) : (
