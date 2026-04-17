@@ -14,12 +14,27 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsSubmitting(true);
+
     // TODO: replace with real auth (NextAuth)
-    document.cookie = 'auth=demo; path=/; max-age=86400; SameSite=Lax';
-    router.push('/home');
+    const response = await fetch('/auth/login', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      router.replace('/home');
+      router.refresh();
+      return;
+    }
+
+    setIsSubmitting(false);
   }
 
   return (
@@ -114,9 +129,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="flex min-h-[48px] w-full items-center justify-center rounded-lg bg-[var(--color-ink)] text-base font-semibold text-[var(--color-accent)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2"
             >
-              Sign In →
+              {isSubmitting ? 'Signing in...' : 'Sign In →'}
             </button>
           </form>
 

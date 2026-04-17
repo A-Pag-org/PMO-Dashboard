@@ -8,18 +8,19 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const authCookie = request.cookies.get('auth')?.value;
+  const hasAuth = authCookie === 'demo';
 
   const isProtectedRoute =
     pathname === '/home' || pathname.startsWith('/dashboard');
   const isLoginRoute = pathname === '/login';
 
-  if (isProtectedRoute && !authCookie) {
+  if (isProtectedRoute && !hasAuth) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isLoginRoute && authCookie) {
+  if (isLoginRoute && hasAuth) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = '/home';
     return NextResponse.redirect(homeUrl);
