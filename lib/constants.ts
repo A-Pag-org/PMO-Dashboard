@@ -129,7 +129,7 @@ export const COMPLETION_THRESHOLDS: CompletionThreshold[] = [
 // ─── Dashboard Selection Options (wireframe page 6) ────────────────────
 
 export const DASHBOARD_OPTIONS: DashboardOption[] = [
-  { name: 'PMO Dashboard', slug: 'pmo', label: 'PMO DASHBOARD', active: false, color: 'blue' },
+  { name: 'Action-Plan Dashboard', slug: 'action-plan', label: 'ACTION-PLAN DASHBOARD', active: false, color: 'blue' },
   { name: 'Impact Dashboard', slug: 'impact', label: 'IMPACT DASHBOARD', active: true, color: 'blue' },
   { name: 'AQI Dashboard', slug: 'aqi', label: 'AQI DASHBOARD', sublabel: '(Phase 3 - TBD)', active: false, color: 'orange' },
 ];
