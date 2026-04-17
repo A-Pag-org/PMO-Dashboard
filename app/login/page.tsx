@@ -15,26 +15,32 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitError(null);
     setIsSubmitting(true);
 
-    // TODO: replace with real auth (NextAuth)
-    const response = await fetch('/auth/login', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      // TODO: replace with real auth (NextAuth)
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        throw new Error('Login request failed');
+      }
+
       router.replace('/home');
       router.refresh();
-      return;
+    } catch {
+      setSubmitError('Unable to sign in right now. Please try again.');
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   }
 
   return (
@@ -134,6 +140,9 @@ export default function LoginPage() {
             >
               {isSubmitting ? 'Signing in...' : 'Sign In →'}
             </button>
+            {submitError ? (
+              <p className="text-center text-xs text-[var(--color-danger)]">{submitError}</p>
+            ) : null}
           </form>
 
           <p className="text-center text-xs text-[var(--color-text-muted)]">
