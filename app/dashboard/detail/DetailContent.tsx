@@ -181,13 +181,12 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     return rows.filter((r) => r.label === rtoFilter);
   }, [stateFilter, cityFilter, rtoFilter]);
 
-  const displayedTableRows = isCentralLevelMetric
-    ? []
-    : effectiveViewLevel === 'state'
-      ? stateTableRows
-      : effectiveViewLevel === 'city'
-        ? filteredCityRows
-        : rtoTableRows;
+  const displayedTableRows = useMemo(() => {
+    if (isCentralLevelMetric) return [];
+    if (effectiveViewLevel === 'state') return stateTableRows;
+    if (effectiveViewLevel === 'city') return filteredCityRows;
+    return rtoTableRows;
+  }, [isCentralLevelMetric, effectiveViewLevel, stateTableRows, filteredCityRows, rtoTableRows]);
 
   const displayedMapData = isCentralLevelMetric
     ? []
@@ -211,14 +210,15 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     return cityRow?.completion ?? 0;
   }, [cityFilter, stateAvg]);
 
-  const filteredGeoCompletion = useMemo(() => {
-    if (isCentralLevelMetric && selectedMetric) {
-      return getCompletionPercentage(selectedMetric.target, selectedMetric.achieved);
-    }
-    if (displayedTableRows.length === 0) return 0;
-    const total = displayedTableRows.reduce((acc, row) => acc + row.completion, 0);
-    return Math.round(total / displayedTableRows.length);
-  }, [displayedTableRows, isCentralLevelMetric, selectedMetric]);
+  const filteredGeoCompletion =
+    isCentralLevelMetric && selectedMetric
+      ? getCompletionPercentage(selectedMetric.target, selectedMetric.achieved)
+      : displayedTableRows.length === 0
+        ? 0
+        : Math.round(
+            displayedTableRows.reduce((acc, row) => acc + row.completion, 0) /
+              displayedTableRows.length,
+          );
 
   const geographyLabel =
     effectiveViewLevel === 'state'
