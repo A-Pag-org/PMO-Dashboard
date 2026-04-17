@@ -131,7 +131,6 @@ export const COMPLETION_THRESHOLDS: CompletionThreshold[] = [
 export const DASHBOARD_OPTIONS: DashboardOption[] = [
   { name: 'Action-Plan Dashboard', slug: 'action-plan', label: 'ACTION-PLAN DASHBOARD', active: false, color: 'blue' },
   { name: 'Impact Dashboard', slug: 'impact', label: 'IMPACT DASHBOARD', active: true, color: 'blue' },
-  { name: 'AQI Dashboard', slug: 'aqi', label: 'AQI DASHBOARD', sublabel: '(Phase 3 - TBD)', active: false, color: 'orange' },
 ];
 
 // ─── Mock Data: Per-Initiative Summary (map + table) ────────────────────

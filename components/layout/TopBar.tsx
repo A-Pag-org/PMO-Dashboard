@@ -11,6 +11,8 @@ export type ActivePage = 'summary' | 'detail' | 'all-data' | 'upload';
 
 interface TopBarProps {
   activePage: ActivePage;
+  pageTitle: string;
+  showBackToSummary?: boolean;
   className?: string;
 }
 
@@ -21,7 +23,12 @@ const NAV_TABS: { key: ActivePage; label: string; href: string; icon: typeof Bar
   { key: 'upload',   label: 'Data Upload',    href: '/dashboard/upload',  icon: Upload },
 ];
 
-export default function TopBar({ activePage, className }: TopBarProps) {
+export default function TopBar({
+  activePage,
+  pageTitle,
+  showBackToSummary = false,
+  className,
+}: TopBarProps) {
   return (
     <header className={cn('shrink-0', className)}>
       {/* ── Top strip: brand + switchers ── */}
@@ -62,6 +69,26 @@ export default function TopBar({ activePage, className }: TopBarProps) {
           );
         })}
       </nav>
+
+      <div className="flex items-center justify-between border-b border-[var(--color-border-table)] bg-white px-4 py-2">
+        {showBackToSummary ? (
+          <Link
+            href="/dashboard/summary"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded px-2 text-xs font-medium text-[var(--color-blue-link)] transition-colors hover:bg-[var(--color-blue-pale)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+          >
+            <Home className="h-3.5 w-3.5" />
+            Back to Summary page
+          </Link>
+        ) : (
+          <div className="h-[36px] w-[170px]" aria-hidden />
+        )}
+
+        <span className="rounded-full bg-[var(--color-navy)] px-4 py-1 text-xs font-semibold tracking-wide text-[var(--color-text-white)]">
+          {pageTitle}
+        </span>
+
+        <div className="h-[36px] w-[170px]" aria-hidden />
+      </div>
     </header>
   );
 }

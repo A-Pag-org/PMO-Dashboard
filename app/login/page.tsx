@@ -124,7 +124,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-[var(--color-text-muted)]">
-            Common log-in for all dashboards (Action-Plan, Impact, AQI)
+            Common log-in for Action-Plan and Impact dashboards (AQI coming later)
           </p>
         </div>
       </div>

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowUpDown } from 'lucide-react';
 import FilterPill from '@/components/ui/FilterPill';
 import DataTable from '@/components/ui/DataTable';
+import BottomBar from '@/components/layout/BottomBar';
 import {
   INITIATIVES,
   MOCK_DETAIL_TABLE_ALL,
@@ -143,6 +144,8 @@ export default function AllDataContent() {
           />
         </div>
       </div>
+
+      <BottomBar showDetailedView={false} showManualData />
     </div>
   );
 }

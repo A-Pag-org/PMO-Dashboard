@@ -5,8 +5,8 @@
 import { cn } from '@/lib/utils';
 
 const dashboards = [
-  { label: 'Action-Plan', href: '#' },
-  { label: 'AQI', href: '#' },
+  { label: 'Action-Plan Dashboard', href: '#' },
+  { label: 'AQI Dashboard', href: '#' },
 ];
 
 interface DashboardSwitcherProps {
@@ -29,7 +29,7 @@ export default function DashboardSwitcher({ className }: DashboardSwitcherProps)
           )}
         >
           {d.label}
-          {d.label === 'AQI' ? (
+          {d.label === 'AQI Dashboard' ? (
             <span className="ml-1 text-[10px] text-white/60">(later)</span>
           ) : null}
         </a>

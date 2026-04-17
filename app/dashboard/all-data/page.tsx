@@ -8,7 +8,11 @@ import AllDataContent from './AllDataContent';
 export default function AllDataPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <TopBar activePage="all-data" />
+      <TopBar
+        activePage="all-data"
+        pageTitle="ALL DATA VIEW"
+        showBackToSummary
+      />
       <AllDataContent />
     </div>
   );
