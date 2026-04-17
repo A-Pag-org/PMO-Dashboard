@@ -233,6 +233,23 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     setViewLevel(v.toLowerCase() as ViewLevel);
   }
 
+  function handleMapBubbleClick(name: string) {
+    const isState = STATES.includes(name as (typeof STATES)[number]);
+    if (isState) {
+      setStateFilter(name);
+      setCityFilter('All');
+      setRtoFilter('All');
+      return;
+    }
+
+    setCityFilter(name);
+    setRtoFilter('All');
+    const mappedState = CITY_STATE_MAP[name];
+    if (mappedState) {
+      setStateFilter(mappedState);
+    }
+  }
+
   return (
     <div className="flex h-full flex-1 flex-col">
       {/* ── FILTER BAR ── */}
@@ -291,6 +308,7 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
               <DelhiNCRMap
                 data={displayedMapData}
                 centerBubble={summaryData?.center ?? MOCK_DETAIL_CENTER_BUBBLE}
+                onBubbleClick={handleMapBubbleClick}
               />
             </div>
           </div>

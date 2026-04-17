@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import CityBubble from './CityBubble';
 import type { MapDataPoint, MapCenterBubble } from '@/lib/types';
@@ -69,6 +70,7 @@ export default function DelhiNCRMap({
   onBubbleClick,
 }: DelhiNCRMapProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [hoveredBubble, setHoveredBubble] = useState<{ x: number; y: number; name: string } | null>(null);
 
   return (
     <svg
@@ -91,7 +93,7 @@ export default function DelhiNCRMap({
             fill={region.fill}
             stroke="white"
             strokeWidth={2}
-            className="transition-opacity hover:opacity-80"
+            className="cursor-pointer transition-opacity hover:opacity-80"
           />
           <text
             x={key === 'haryana' ? 70 : key === 'up' ? 280 : key === 'delhi' ? 180 : 80}
@@ -136,12 +138,37 @@ export default function DelhiNCRMap({
             initial={shouldReduceMotion ? 'visible' : 'hidden'}
             animate="visible"
             onClick={() => onBubbleClick?.(point.name)}
+            onMouseEnter={() => setHoveredBubble({ x: pos.x, y: pos.y - 22, name: point.name })}
+            onMouseLeave={() => setHoveredBubble((prev) => (prev?.name === point.name ? null : prev))}
             className="cursor-pointer"
           >
             <CityBubble data={point} x={pos.x} y={pos.y} />
           </motion.g>
         );
       })}
+
+      {hoveredBubble ? (
+        <g pointerEvents="none" transform={`translate(${hoveredBubble.x}, ${hoveredBubble.y})`}>
+          <rect
+            x={-30}
+            y={-11}
+            width={60}
+            height={18}
+            rx={9}
+            fill="var(--color-navy)"
+            opacity={0.95}
+          />
+          <text
+            x={0}
+            y={1}
+            textAnchor="middle"
+            fill="var(--color-text-white)"
+            style={{ fontSize: 8, fontWeight: 600 }}
+          >
+            See on map
+          </text>
+        </g>
+      ) : null}
     </svg>
   );
 }
