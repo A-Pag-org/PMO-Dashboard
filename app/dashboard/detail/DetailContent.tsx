@@ -5,7 +5,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 import {
   Truck,
   Calendar,
@@ -284,16 +283,7 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
         </p>
       </div>
 
-      <div className="px-4 pb-2">
-        <Link
-          href="/dashboard/all-data"
-          className="inline-flex min-h-[40px] items-center rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors hover:bg-[var(--color-navy-mid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
-        >
-          See all data
-        </Link>
-      </div>
-
-      <BottomBar showDetailedView={false} showManualData />
+      <BottomBar showDetailedView={false} showAllDataView showManualData />
     </div>
   );
 }

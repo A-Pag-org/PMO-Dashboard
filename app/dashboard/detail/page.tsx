@@ -9,7 +9,11 @@ import DetailContent from './DetailContent';
 export default function DetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <TopBar activePage="detail" />
+      <TopBar
+        activePage="detail"
+        pageTitle="DETAILED VIEW (1/2)"
+        showBackToSummary
+      />
       <DetailContent initiatives={INITIATIVES} />
     </div>
   );

@@ -41,14 +41,19 @@ export default function HomePage() {
 
       {/* ── Card grid ── */}
       <main className="-mt-4 flex flex-1 justify-center px-8 pb-16">
-        <div className="grid w-full max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
-          {DASHBOARD_OPTIONS.map((d) => (
-            <DashboardCard
-              key={d.slug}
-              dashboard={d}
-              href={hrefMap[d.slug]}
-            />
-          ))}
+        <div className="w-full max-w-5xl space-y-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {DASHBOARD_OPTIONS.map((d) => (
+              <DashboardCard
+                key={d.slug}
+                dashboard={d}
+                href={hrefMap[d.slug]}
+              />
+            ))}
+          </div>
+          <p className="text-center text-xs text-[var(--color-text-muted)]">
+            AQI Dashboard integration is planned for a later phase.
+          </p>
         </div>
       </main>
     </div>
