@@ -23,6 +23,13 @@ const NAV_TABS: { key: ActivePage; label: string; href: string; icon: typeof Bar
   { key: 'upload',   label: 'Data Upload',    href: '/dashboard/upload',  icon: Upload },
 ];
 
+const BREADCRUMB_LABELS: Record<ActivePage, string> = {
+  summary: 'Summary',
+  detail: 'Detailed View',
+  'all-data': 'All Data View',
+  upload: 'Manual Data Upload',
+};
+
 export default function TopBar({
   activePage,
   pageTitle,
@@ -70,7 +77,7 @@ export default function TopBar({
         })}
       </nav>
 
-      <div className="flex items-center justify-between border-b border-[var(--color-border-table)] bg-white px-4 py-2">
+      <div className="flex items-center justify-between bg-white px-4 py-2">
         {showBackToSummary ? (
           <Link
             href="/dashboard/summary"
@@ -89,6 +96,32 @@ export default function TopBar({
 
         <div className="h-[36px] w-[170px]" aria-hidden />
       </div>
+
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-2 border-b border-[var(--color-border-table)] bg-[var(--color-surface-light)] px-4 py-1.5 text-xs"
+      >
+        <Link
+          href="/home"
+          className="text-[var(--color-blue-link)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
+        >
+          Home
+        </Link>
+        <span className="text-[var(--color-text-muted)]">/</span>
+        <Link
+          href="/dashboard/summary"
+          className="text-[var(--color-blue-link)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
+        >
+          Impact Dashboard
+        </Link>
+        <span className="text-[var(--color-text-muted)]">/</span>
+        <span
+          className="font-medium text-[var(--color-text-secondary)]"
+          aria-current="page"
+        >
+          {BREADCRUMB_LABELS[activePage]}
+        </span>
+      </nav>
     </header>
   );
 }
