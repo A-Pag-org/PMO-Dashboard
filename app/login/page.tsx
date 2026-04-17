@@ -35,9 +35,6 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold leading-snug text-white">
             Delhi Air Pollution<br />Mitigation Dashboard
           </h1>
-          <p className="mt-3 text-sm text-white/60">
-            Air Pollution Action Group (A-PAG)
-          </p>
         </div>
       </div>
 
@@ -59,7 +56,7 @@ export default function LoginPage() {
 
           {/* Mobile-only title */}
           <h1 className="text-center text-xl font-bold text-[var(--color-ink)] lg:hidden">
-            A-PAG Impact Dashboard
+            Impact Dashboard
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-5">
