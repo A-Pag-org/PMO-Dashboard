@@ -12,6 +12,8 @@ interface ProgressMetricRowProps {
   label: string;
   achieved: number | null;
   target: number | null;
+  selected?: boolean;
+  onSelect?: () => void;
 }
 
 export default function ProgressMetricRow({
@@ -19,10 +21,13 @@ export default function ProgressMetricRow({
   label,
   achieved,
   target,
+  selected = false,
+  onSelect,
 }: ProgressMetricRowProps) {
   const pct = getCompletionPercentage(target, achieved);
+  const isInteractive = Boolean(onSelect);
 
-  return (
+  const content = (
     <div className="flex items-center gap-3 rounded-md border border-[var(--color-divider-dashed)] bg-white px-3 py-2">
       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--color-blue-pale)]">
         <Icon className="h-3.5 w-3.5 text-[var(--color-blue-link)]" />
@@ -44,5 +49,28 @@ export default function ProgressMetricRow({
         <Info className="h-3 w-3" />
       </span>
     </div>
+  );
+
+  if (!isInteractive) {
+    return content;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      className="w-full rounded-md text-left transition-colors hover:bg-[var(--color-blue-pale)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+    >
+      <div
+        className={
+          selected
+            ? 'rounded-md ring-1 ring-[var(--color-border-blue)]'
+            : undefined
+        }
+      >
+        {content}
+      </div>
+    </button>
   );
 }

@@ -32,11 +32,15 @@ export default function AllDataContent() {
   const [initiative, setInitiative] = useState(INITIATIVES[0].name);
   const [stateFilter, setStateFilter] = useState('All');
   const [sortBy, setSortBy] = useState<SortBy>('completion-desc');
+  const [selectedMetricByInitiative, setSelectedMetricByInitiative] = useState<Record<string, string>>({});
   const selectedInitiative = INITIATIVES.find((i) => i.name === initiative) ?? INITIATIVES[0];
+  const metricOptions = selectedInitiative.metrics.map((m) => m.name);
+  const selectedMetricName = selectedMetricByInitiative[selectedInitiative.slug] ?? metricOptions[0];
+  const selectedMetric = selectedInitiative.metrics.find((m) => m.name === selectedMetricName) ?? selectedInitiative.metrics[0];
 
-  const tableRows = useMemo(() => {
+  const baseRows = useMemo(() => {
     const summaryRows = MOCK_SUMMARY_BY_INITIATIVE[selectedInitiative.slug]?.table ?? [];
-    const baseRows = summaryRows.length > 0
+    const metricBaseRows = summaryRows.length > 0
       ? summaryRows.map((row) => ({
           geography: row.state,
           target: row.target,
@@ -45,7 +49,7 @@ export default function AllDataContent() {
         }))
       : MOCK_DETAIL_TABLE_ALL;
 
-    const rows = baseRows.filter((row) => {
+    const rows = metricBaseRows.filter((row) => {
       if (stateFilter === 'All') return true;
       return CITY_STATE_MAP[row.geography] === stateFilter || row.geography === stateFilter;
     });
@@ -71,6 +75,9 @@ export default function AllDataContent() {
     }));
   }, [selectedInitiative.slug, stateFilter, sortBy]);
 
+  const tableRows = selectedMetric?.geographyLevel === 'central' ? [] : baseRows;
+  const continuationMetrics = selectedInitiative.metrics.filter((m) => m.name !== selectedMetric?.name).slice(0, 2);
+
   const sortLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label ?? SORT_OPTIONS[0].label;
   const stateOptions = ['All', ...STATES];
   const cityCount = stateFilter === 'All'
@@ -92,6 +99,17 @@ export default function AllDataContent() {
             options={stateOptions}
             value={stateFilter}
             onChange={setStateFilter}
+          />
+          <FilterPill
+            label="Metric"
+            options={metricOptions}
+            value={selectedMetricName}
+            onChange={(metricName) =>
+              setSelectedMetricByInitiative((prev) => ({
+                ...prev,
+                [selectedInitiative.slug]: metricName,
+              }))
+            }
           />
           <FilterPill
             label="Sort"
@@ -126,23 +144,37 @@ export default function AllDataContent() {
         </div>
 
         <DataTable
-          title={`${initiative} — All Data View`}
+          title={`${selectedMetric?.name ?? initiative} — All Data View`}
           geographyLabel="Geography"
           rows={tableRows}
         />
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DataTable
-            title="Additional Metric Table A"
-            geographyLabel="Geography"
-            rows={tableRows}
-          />
-          <DataTable
-            title="Additional Metric Table B"
-            geographyLabel="Geography"
-            rows={tableRows}
-          />
-        </div>
+        {selectedMetric?.geographyLevel === 'central' ? (
+          <div className="rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
+            <p className="text-xs text-[var(--color-text-muted)]">
+              {selectedMetric.name} is a central-level metric and appears only in the center bubble (not in the geography table).
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {continuationMetrics.map((metric) =>
+              metric.geographyLevel === 'central' ? (
+                <div key={metric.name} className="rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    {metric.name} is central-level and is not shown in this table view.
+                  </p>
+                </div>
+              ) : (
+                <DataTable
+                  key={metric.name}
+                  title={metric.name}
+                  geographyLabel="Geography"
+                  rows={baseRows}
+                />
+              ),
+            )}
+          </div>
+        )}
       </div>
 
       <BottomBar showDetailedView={false} showManualData />

@@ -12,6 +12,7 @@ export interface Metric {
   target: number | null;
   achieved: number | null;
   unit?: string;
+  geographyLevel?: 'state' | 'city' | 'rto' | 'central';
 }
 
 export interface Initiative {
