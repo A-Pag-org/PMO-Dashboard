@@ -18,7 +18,7 @@ export default function LoginPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     // TODO: replace with real auth (NextAuth)
-    document.cookie = 'auth=demo; path=/; max-age=86400';
+    document.cookie = 'auth=demo; path=/; max-age=86400; SameSite=Lax';
     router.push('/home');
   }
 
