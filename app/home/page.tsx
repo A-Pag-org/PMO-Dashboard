@@ -22,7 +22,7 @@ export default function HomePage() {
           </span>
         </div>
         <Link
-          href="/login"
+          href="/logout"
           className="text-xs text-white/60 hover:text-white transition-colors"
         >
           Sign out

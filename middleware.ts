@@ -1,23 +1,33 @@
 // FILE: middleware.ts
-// PURPOSE: Basic route protection — currently disabled for testing
+// PURPOSE: Route protection for authenticated dashboard access
 // DESIGN REF: Wireframe page 5 (login is the entry gate)
-// TODO: Re-enable auth check before production deployment
 
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware() {
-  // Auth check disabled during development/testing.
-  // Uncomment the block below to re-enable:
-  //
-  // const authCookie = request.cookies.get('auth');
-  // if (!authCookie) {
-  //   const loginUrl = new URL('/login', request.url);
-  //   return NextResponse.redirect(loginUrl);
-  // }
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const authCookie = request.cookies.get('auth')?.value;
+
+  const isProtectedRoute =
+    pathname === '/home' || pathname.startsWith('/dashboard');
+  const isLoginRoute = pathname === '/login';
+
+  if (isProtectedRoute && !authCookie) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (isLoginRoute && authCookie) {
+    const homeUrl = request.nextUrl.clone();
+    homeUrl.pathname = '/home';
+    return NextResponse.redirect(homeUrl);
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/home', '/dashboard/:path*'],
+  matcher: ['/login', '/home', '/dashboard/:path*'],
 };
