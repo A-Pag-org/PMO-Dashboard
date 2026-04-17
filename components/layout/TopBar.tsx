@@ -3,7 +3,7 @@
 // DESIGN REF: Wireframe pages 7–11 — redesigned for clarity + ease of use
 
 import Link from 'next/link';
-import { Home, BarChart3, Search, Upload, Table } from 'lucide-react';
+import { Home, BarChart3, Search, Upload, ArrowRight } from 'lucide-react';
 import DashboardSwitcher from './DashboardSwitcher';
 import { cn } from '@/lib/utils';
 
@@ -16,18 +16,17 @@ interface TopBarProps {
   className?: string;
 }
 
-const NAV_TABS: { key: ActivePage; label: string; href: string; icon: typeof BarChart3 }[] = [
-  { key: 'summary',  label: 'Summary',       href: '/dashboard/summary', icon: BarChart3 },
-  { key: 'detail',   label: 'Detailed View',  href: '/dashboard/detail',  icon: Search },
-  { key: 'all-data', label: 'All Data',      href: '/dashboard/all-data', icon: Table },
-  { key: 'upload',   label: 'Data Upload',    href: '/dashboard/upload',  icon: Upload },
+const NAV_TABS: { key: Exclude<ActivePage, 'all-data'>; label: string; href: string; icon: typeof BarChart3 }[] = [
+  { key: 'summary',  label: 'Summary',         href: '/dashboard/summary', icon: BarChart3 },
+  { key: 'detail',   label: 'Detailed Report', href: '/dashboard/detail',  icon: Search },
+  { key: 'upload',   label: 'Enter Data',      href: '/dashboard/upload',  icon: Upload },
 ];
 
 const BREADCRUMB_LABELS: Record<ActivePage, string> = {
   summary: 'Summary',
-  detail: 'Detailed View',
-  'all-data': 'All Data View',
-  upload: 'Manual Data Upload',
+  detail: 'Detailed Report',
+  'all-data': 'Full Data Table',
+  upload: 'Data Entry',
 };
 
 export default function TopBar({
@@ -55,7 +54,9 @@ export default function TopBar({
       {/* ── Tab navigation bar ── */}
       <nav className="flex bg-[var(--color-navy)]" aria-label="Dashboard pages">
         {NAV_TABS.map((tab) => {
-          const isActive = tab.key === activePage;
+          const isActive =
+            tab.key === activePage ||
+            (activePage === 'all-data' && tab.key === 'detail');
           const Icon = tab.icon;
           return (
             <Link
@@ -101,6 +102,7 @@ export default function TopBar({
         aria-label="Breadcrumb"
         className="flex items-center gap-2 border-b border-[var(--color-border-table)] bg-[var(--color-surface-light)] px-4 py-1.5 text-xs"
       >
+        <span className="font-medium text-[var(--color-text-secondary)]">You are here:</span>
         <Link
           href="/home"
           className="text-[var(--color-blue-link)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
@@ -122,6 +124,29 @@ export default function TopBar({
           {BREADCRUMB_LABELS[activePage]}
         </span>
       </nav>
+
+      <div className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border-table)] bg-white px-4 py-2">
+        <span className="text-xs font-semibold text-[var(--color-text-secondary)]">Quick actions:</span>
+        <Link
+          href="/dashboard/summary"
+          className="inline-flex min-h-[36px] items-center gap-1 rounded-md bg-[var(--color-navy)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--color-navy-mid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        >
+          Summary
+        </Link>
+        <Link
+          href="/dashboard/detail"
+          className="inline-flex min-h-[36px] items-center gap-1 rounded-md bg-[var(--color-navy)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--color-navy-mid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        >
+          Detailed Report
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <Link
+          href="/dashboard/upload"
+          className="inline-flex min-h-[36px] items-center gap-1 rounded-md bg-[var(--color-navy)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--color-navy-mid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        >
+          Enter Data
+        </Link>
+      </div>
     </header>
   );
 }

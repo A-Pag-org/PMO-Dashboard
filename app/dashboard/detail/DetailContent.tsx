@@ -103,6 +103,13 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     setRtoFilter('All');
   }
 
+  function handleResetFilters() {
+    setStateFilter('All');
+    setCityFilter('All');
+    setRtoFilter('All');
+    setViewLevel('state');
+  }
+
   // Filter map data based on selections
   const filteredMapData = useMemo(() => {
     let data = MOCK_DETAIL_MAP_DATA;
@@ -228,6 +235,11 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
         : 'RTO';
   const secondaryMetric =
     currentInit.metrics.find((m) => m.name !== selectedMetric?.name && m.geographyLevel !== 'central');
+  const activeFilters = [
+    stateFilter !== 'All' ? `State: ${stateFilter}` : null,
+    cityFilter !== 'All' ? `City: ${cityFilter}` : null,
+    rtoFilter !== 'All' ? `RTO: ${rtoFilter}` : null,
+  ].filter(Boolean) as string[];
 
   function handleViewLevelChange(v: string) {
     setViewLevel(v.toLowerCase() as ViewLevel);
@@ -279,6 +291,28 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
           value={selectedInitiative}
           onChange={setSelectedInitiative}
         />
+        <button
+          type="button"
+          onClick={handleResetFilters}
+          className="ml-auto inline-flex min-h-[40px] items-center rounded-md border border-white/40 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        >
+          Reset filters
+        </button>
+      </div>
+      <div className="flex min-h-[34px] items-center gap-2 border-b border-[var(--color-divider-dashed)] bg-[var(--color-surface-light)] px-4 py-1.5">
+        <span className="text-xs font-semibold text-[var(--color-text-secondary)]">Active filters:</span>
+        {activeFilters.length > 0 ? (
+          activeFilters.map((filter) => (
+            <span
+              key={filter}
+              className="inline-flex rounded-full bg-white px-2 py-0.5 text-xs font-medium text-[var(--color-text-primary)]"
+            >
+              {filter}
+            </span>
+          ))
+        ) : (
+          <span className="text-xs text-[var(--color-text-muted)]">None (showing all)</span>
+        )}
       </div>
 
       {/* ── TOP HALF — Map + Metrics ── */}

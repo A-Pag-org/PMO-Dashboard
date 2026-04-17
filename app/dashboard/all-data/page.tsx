@@ -10,7 +10,7 @@ export default function AllDataPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <TopBar
         activePage="all-data"
-        pageTitle="ALL DATA VIEW"
+        pageTitle="FULL DATA TABLE"
         showBackToSummary
       />
       <AllDataContent />
