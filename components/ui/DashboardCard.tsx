@@ -5,17 +5,18 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { DashboardOption } from '@/lib/types';
 
 interface DashboardCardProps {
   dashboard: DashboardOption;
-  href?: string;
+  href: string;
 }
 
 export default function DashboardCard({ dashboard, href }: DashboardCardProps) {
   const router = useRouter();
-  const isClickable = dashboard.active && href;
+  const isClickable = dashboard.active;
 
   function handleActivate() {
     if (isClickable) {
@@ -30,22 +31,8 @@ export default function DashboardCard({ dashboard, href }: DashboardCardProps) {
     }
   }
 
-  return (
-    <div
-      role="button"
-      tabIndex={isClickable ? 0 : -1}
-      onClick={handleActivate}
-      onKeyDown={handleKeyDown}
-      aria-disabled={!isClickable}
-      className={cn(
-        'flex min-h-[260px] flex-col items-center justify-center rounded-xl border-2 p-8 text-center transition-all',
-        dashboard.active
-          ? 'cursor-pointer border-[var(--color-border-blue)] bg-white shadow-lg hover:shadow-xl'
-          : 'border-[var(--color-border)] bg-[var(--color-surface-grey)]',
-        isClickable &&
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
-      )}
-    >
+  const cardInner = (
+    <>
       <div
         className={cn(
           'mb-6 flex h-16 w-16 items-center justify-center rounded-full',
@@ -86,6 +73,37 @@ export default function DashboardCard({ dashboard, href }: DashboardCardProps) {
           Active
         </span>
       )}
+    </>
+  );
+
+  if (isClickable) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          'flex min-h-[260px] flex-col items-center justify-center rounded-xl border-2 p-8 text-center transition-all',
+          'cursor-pointer border-[var(--color-border-blue)] bg-white shadow-lg hover:shadow-xl',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
+        )}
+      >
+        {cardInner}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      role="button"
+      tabIndex={-1}
+      onClick={handleActivate}
+      onKeyDown={handleKeyDown}
+      aria-disabled
+      className={cn(
+        'flex min-h-[260px] flex-col items-center justify-center rounded-xl border-2 p-8 text-center transition-all',
+        'border-[var(--color-border)] bg-[var(--color-surface-grey)]',
+      )}
+    >
+      {cardInner}
     </div>
   );
 }
