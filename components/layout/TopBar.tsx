@@ -3,11 +3,11 @@
 // DESIGN REF: Wireframe pages 7–11 — redesigned for clarity + ease of use
 
 import Link from 'next/link';
-import { Home, BarChart3, Search, Upload } from 'lucide-react';
+import { Home, BarChart3, Search, Upload, Table } from 'lucide-react';
 import DashboardSwitcher from './DashboardSwitcher';
 import { cn } from '@/lib/utils';
 
-export type ActivePage = 'summary' | 'detail' | 'upload';
+export type ActivePage = 'summary' | 'detail' | 'all-data' | 'upload';
 
 interface TopBarProps {
   activePage: ActivePage;
@@ -17,6 +17,7 @@ interface TopBarProps {
 const NAV_TABS: { key: ActivePage; label: string; href: string; icon: typeof BarChart3 }[] = [
   { key: 'summary',  label: 'Summary',       href: '/dashboard/summary', icon: BarChart3 },
   { key: 'detail',   label: 'Detailed View',  href: '/dashboard/detail',  icon: Search },
+  { key: 'all-data', label: 'All Data',      href: '/dashboard/all-data', icon: Table },
   { key: 'upload',   label: 'Data Upload',    href: '/dashboard/upload',  icon: Upload },
 ];
 

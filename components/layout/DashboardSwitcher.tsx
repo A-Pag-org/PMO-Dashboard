@@ -1,11 +1,11 @@
 // FILE: components/layout/DashboardSwitcher.tsx
-// PURPOSE: PMO / AQI dashboard switcher links — compact for top strip
-// DESIGN REF: Wireframe pages 7–11 (right side of top bar)
+// PURPOSE: Action-Plan / AQI-future dashboard switcher links in top strip
+// DESIGN REF: Structure flow pages 7–11 (cross-dashboard links)
 
 import { cn } from '@/lib/utils';
 
 const dashboards = [
-  { label: 'PMO', href: '#' },
+  { label: 'Action-Plan', href: '#' },
   { label: 'AQI', href: '#' },
 ];
 
@@ -29,6 +29,9 @@ export default function DashboardSwitcher({ className }: DashboardSwitcherProps)
           )}
         >
           {d.label}
+          {d.label === 'AQI' ? (
+            <span className="ml-1 text-[10px] text-white/60">(later)</span>
+          ) : null}
         </a>
       ))}
     </div>

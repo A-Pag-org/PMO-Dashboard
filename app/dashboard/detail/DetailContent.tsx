@@ -5,6 +5,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Truck,
   Calendar,
@@ -20,6 +21,7 @@ import MetricCard from '@/components/ui/MetricCard';
 import ProgressMetricRow from '@/components/ui/ProgressMetricRow';
 import AverageOval from '@/components/ui/AverageOval';
 import DataTable from '@/components/ui/DataTable';
+import BottomBar from '@/components/layout/BottomBar';
 import {
   STATES,
   CITIES,
@@ -134,7 +136,7 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex h-full flex-1 flex-col">
       {/* ── FILTER BAR ── */}
       <div className="flex shrink-0 flex-wrap items-center gap-2 bg-[var(--color-navy-mid)] px-4 py-2">
         <FilterPill
@@ -281,6 +283,17 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
           only metrics applicable to the selected view will be shown.
         </p>
       </div>
+
+      <div className="px-4 pb-2">
+        <Link
+          href="/dashboard/all-data"
+          className="inline-flex min-h-[40px] items-center rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors hover:bg-[var(--color-navy-mid)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        >
+          See all data
+        </Link>
+      </div>
+
+      <BottomBar showDetailedView={false} showManualData />
     </div>
   );
 }

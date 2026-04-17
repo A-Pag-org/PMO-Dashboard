@@ -8,12 +8,14 @@ import { cn } from '@/lib/utils';
 
 interface BottomBarProps {
   showDetailedView?: boolean;
+  showAllDataView?: boolean;
   showManualData?: boolean;
   className?: string;
 }
 
 export default function BottomBar({
   showDetailedView = true,
+  showAllDataView = false,
   showManualData = true,
   className,
 }: BottomBarProps) {
@@ -24,19 +26,37 @@ export default function BottomBar({
         className,
       )}
     >
-      {showDetailedView ? (
-        <Link
-          href="/dashboard/detail"
-          className={cn(
-            'flex min-h-[36px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors',
-            'hover:bg-[var(--color-navy-mid)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
+      {showDetailedView || showAllDataView ? (
+        <div className="flex items-center gap-2">
+          {showDetailedView && (
+            <Link
+              href="/dashboard/detail"
+              className={cn(
+                'flex min-h-[36px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors',
+                'hover:bg-[var(--color-navy-mid)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
+              )}
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              <span>Detailed view</span>
+              <ChevronDown className="h-3.5 w-3.5" />
+            </Link>
           )}
-        >
-          <ArrowRight className="h-3.5 w-3.5" />
-          <span>Detailed view</span>
-          <ChevronDown className="h-3.5 w-3.5" />
-        </Link>
+          {showAllDataView && (
+            <Link
+              href="/dashboard/all-data"
+              className={cn(
+                'flex min-h-[36px] items-center gap-2 rounded-md bg-[var(--color-navy)] px-4 py-1.5 text-xs font-medium text-[var(--color-text-white)] transition-colors',
+                'hover:bg-[var(--color-navy-mid)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
+              )}
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              <span>See all data</span>
+              <ChevronDown className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </div>
       ) : (
         <div />
       )}
