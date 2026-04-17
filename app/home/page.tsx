@@ -2,7 +2,6 @@
 // PURPOSE: Dashboard selection page — branded header + dashboard cards
 // DESIGN REF: Wireframe page 6 of 13 (Dashboard selection)
 
-import Link from 'next/link';
 import { Home } from 'lucide-react';
 import { DASHBOARD_OPTIONS } from '@/lib/constants';
 import DashboardCard from '@/components/ui/DashboardCard';
@@ -21,12 +20,14 @@ export default function HomePage() {
             <Home className="h-4 w-4 text-[var(--color-ink)]" />
           </span>
         </div>
-        <Link
-          href="/logout"
-          className="text-xs text-white/60 hover:text-white transition-colors"
-        >
-          Sign out
-        </Link>
+        <form action="/logout" method="post">
+          <button
+            type="submit"
+            className="text-xs text-white/60 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink)]"
+          >
+            Sign out
+          </button>
+        </form>
       </div>
 
       {/* ── Header ── */}
