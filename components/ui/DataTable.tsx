@@ -34,7 +34,7 @@ export default function DataTable({
       )}
       <table className="w-full text-left">
         <thead>
-          <tr className="bg-[var(--color-navy)]">
+          <tr className="sticky top-0 z-10 bg-[var(--color-navy)]">
             <th
               scope="col"
               className="px-4 py-3 text-xs font-semibold tracking-wide text-[var(--color-text-white)]"
@@ -63,36 +63,49 @@ export default function DataTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
-            <tr
-              key={row.label}
-              className={
-                i % 2 === 0
-                  ? 'bg-white'
-                  : 'bg-[var(--color-surface-light)]'
-              }
-              style={{
-                borderBottom: '1px dashed var(--color-divider-dashed)',
-              }}
-            >
-              <td className="px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">
-                {row.label}
-              </td>
-              <td className="px-4 py-3 text-right text-sm text-[var(--color-text-primary)]">
-                <span className="rounded bg-[var(--color-surface-warm)] px-2 py-0.5">
-                  {formatNumber(row.target)}
-                </span>
-              </td>
-              <td className="px-4 py-3 text-right text-sm text-[var(--color-text-primary)]">
-                <span className="rounded bg-[var(--color-surface-warm)] px-2 py-0.5">
-                  {formatNumber(row.achieved)}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <CompletionBar value={row.completion} showLabel size="sm" />
+          {rows.length > 0 ? (
+            rows.map((row, i) => (
+              <tr
+                key={row.label}
+                className={
+                  row.completion < 40
+                    ? 'bg-[var(--color-danger-light)]'
+                    : i % 2 === 0
+                      ? 'bg-white'
+                      : 'bg-[var(--color-surface-light)]'
+                }
+                style={{
+                  borderBottom: '1px dashed var(--color-divider-dashed)',
+                }}
+              >
+                <td className="px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">
+                  {row.label}
+                </td>
+                <td className="px-4 py-3 text-right text-sm text-[var(--color-text-primary)]">
+                  <span className="rounded bg-[var(--color-surface-warm)] px-2 py-0.5">
+                    {formatNumber(row.target)}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right text-sm text-[var(--color-text-primary)]">
+                  <span className="rounded bg-[var(--color-surface-warm)] px-2 py-0.5">
+                    {formatNumber(row.achieved)}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <CompletionBar value={row.completion} showLabel size="sm" />
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={4}
+                className="px-4 py-6 text-center text-sm text-[var(--color-text-muted)]"
+              >
+                No data available for this filter. Reset filters to continue.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

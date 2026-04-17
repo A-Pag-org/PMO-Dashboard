@@ -203,14 +203,14 @@ export default function UploadContent() {
     const fileName = file.name.toLowerCase();
 
     if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
-      showUploadStatus('error', 'Invalid file format. Please upload a .csv or .xlsx file.');
+      showUploadStatus('error', 'Invalid file type. Please upload CSV or XLSX.');
       e.target.value = '';
       return;
     }
 
     if (fileName.endsWith('.xlsx')) {
       // TODO: replace with real XLSX parsing + validation
-      showUploadStatus('warning', 'XLSX validation is not enabled in demo. Please upload the downloaded CSV template.');
+      showUploadStatus('warning', 'For this demo, please upload the downloaded CSV template.');
       e.target.value = '';
       return;
     }
@@ -231,7 +231,7 @@ export default function UploadContent() {
         expected.length === actual.length &&
         expected.every((h, idx) => h === actual[idx]);
       if (!headerMatches) {
-        showUploadStatus('error', 'Template structure mismatch. Please use the latest downloaded template.');
+        showUploadStatus('error', 'Template mismatch. Please use the latest downloaded template.');
         e.target.value = '';
         return;
       }
@@ -240,7 +240,7 @@ export default function UploadContent() {
       const metricIdx = header.findIndex((h) => normalizeHeader(h) === normalizeHeader('Metric'));
       const newValIdx = header.findIndex((h) => normalizeHeader(h) === normalizeHeader('New Val'));
       if (geographyIdx === -1 || metricIdx === -1 || newValIdx === -1) {
-        showUploadStatus('error', 'Template is missing required columns (Geography, Metric, New Val).');
+        showUploadStatus('error', 'Template is missing required columns: Geography, Metric, New Val.');
         e.target.value = '';
         return;
       }
@@ -295,16 +295,16 @@ export default function UploadContent() {
       } else if (updatedRows > 0) {
         showUploadStatus(
           'warning',
-          `Upload partially applied: ${updatedRows} updated, ${ignoredRows} ignored (access control), ${unmatchedRows} unmatched.`,
+          `Upload partially applied: ${updatedRows} updated, ${ignoredRows} not in your access, ${unmatchedRows} unmatched.`,
         );
       } else {
         showUploadStatus(
           'warning',
-          'No accessible rows were updated. Ensure you are uploading your assigned template rows.',
+          'No rows were updated. Please upload rows from your assigned template.',
         );
       }
     } catch {
-      showUploadStatus('error', 'Could not parse uploaded file. Please download a fresh template and retry.');
+      showUploadStatus('error', 'Could not read uploaded file. Please download a fresh template and retry.');
     }
 
     e.target.value = '';

@@ -38,7 +38,7 @@ export default function BottomBar({
               )}
             >
               <ArrowRight className="h-3.5 w-3.5" />
-              <span>Detailed view</span>
+              <span>Detailed report</span>
               <ChevronDown className="h-3.5 w-3.5" />
             </Link>
           )}
@@ -52,7 +52,7 @@ export default function BottomBar({
               )}
             >
               <ArrowRight className="h-3.5 w-3.5" />
-              <span>See all data</span>
+              <span>Full data table</span>
               <ChevronDown className="h-3.5 w-3.5" />
             </Link>
           )}
@@ -71,7 +71,7 @@ export default function BottomBar({
           )}
         >
           <FileSpreadsheet className="h-3.5 w-3.5" />
-          <span>Enter manual data field</span>
+          <span>Enter data</span>
           <ChevronDown className="h-3.5 w-3.5" />
         </Link>
       )}
