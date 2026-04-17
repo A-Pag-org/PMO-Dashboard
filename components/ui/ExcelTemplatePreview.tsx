@@ -14,9 +14,9 @@ const COLUMNS = [
   { name: 'New Val', locked: false },
   { name: 'Last updated', locked: true },
   { name: 'Last updated by', locked: true },
-  { name: 'Start date', locked: false },
-  { name: 'End date', locked: false },
-  { name: 'Remarks', locked: false },
+  { name: 'Start date', locked: true },
+  { name: 'End date', locked: true },
+  { name: 'Remarks', locked: true },
 ];
 
 const SAMPLE_ROWS = [
