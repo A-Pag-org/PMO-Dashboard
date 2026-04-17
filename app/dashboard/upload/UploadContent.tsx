@@ -17,16 +17,99 @@ import {
 } from '@/lib/constants';
 import type { UploadRow } from '@/lib/types';
 
-type UploadStatus = 'idle' | 'success' | 'error';
+type UploadStatusType = 'idle' | 'success' | 'error' | 'warning';
+
+interface UploadStatus {
+  type: UploadStatusType;
+  message: string;
+}
 
 const INITIATIVE_NAMES = Object.keys(UPLOAD_INITIATIVE_SLUG_MAP);
+const CSV_HEADERS = [
+  'Geography',
+  'Metric',
+  'Metric Type',
+  'Target Val',
+  'Current Val',
+  'Unit',
+  'New Val',
+  'Last Updated',
+  'Last Updated By',
+  'Start Date',
+  'End Date',
+  'Remarks',
+] as const;
+
+const EMPTY_UPLOAD_STATUS: UploadStatus = {
+  type: 'idle',
+  message: '',
+};
+
+function toAccessKey(geography: string, metric: string): string {
+  return `${geography}::${metric}`;
+}
+
+function normalizeHeader(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (char === '"' && inQuotes && nextChar === '"') {
+      current += '"';
+      i += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  result.push(current);
+  return result.map((cell) => cell.trim());
+}
+
+function parseCsv(text: string): string[][] {
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .split('\n')
+    .filter((line) => line.trim().length > 0)
+    .map(parseCsvLine);
+}
+
+function escapeCsvCell(value: unknown): string {
+  const str = String(value ?? '');
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
 
 export default function UploadContent() {
   const [initiative, setInitiative] = useState(INITIATIVE_NAMES[0]);
   const [state, setState] = useState<string>('All');
   const [city, setCity] = useState<string>('All');
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>(EMPTY_UPLOAD_STATUS);
   const fileRef = useRef<HTMLInputElement>(null);
+  const statusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const slug = UPLOAD_INITIATIVE_SLUG_MAP[initiative] ?? 'naya-safar-yojana';
 
@@ -69,6 +152,7 @@ export default function UploadContent() {
 
   function handleNewValChange(filteredIndex: number, value: string) {
     const targetRow = filteredRows[filteredIndex];
+    if (!targetRow) return;
     setRowsByInitiative((prev) => ({
       ...prev,
       [slug]: prev[slug].map((r) =>
@@ -79,19 +163,27 @@ export default function UploadContent() {
     }));
   }
 
+  function showUploadStatus(type: UploadStatusType, message: string): void {
+    setUploadStatus({ type, message });
+    if (statusTimeoutRef.current) {
+      clearTimeout(statusTimeoutRef.current);
+    }
+    statusTimeoutRef.current = setTimeout(() => {
+      setUploadStatus(EMPTY_UPLOAD_STATUS);
+      statusTimeoutRef.current = null;
+    }, 5000);
+  }
+
   function handleDownload() {
-    const headers = [
-      'Geography', 'Metric', 'Metric Type', 'Target Val', 'Current Val',
-      'Unit', 'New Val', 'Last Updated', 'Last Updated By',
-      'Start Date', 'End Date', 'Remarks',
-    ];
     const csvRows = filteredRows.map((r) => [
       r.geography, r.metric, r.metricType,
       r.targetVal ?? '', r.currentVal ?? '', r.unit,
       r.newVal, r.lastUpdated, r.lastUpdatedBy,
       r.startDate, r.endDate, r.remarks,
     ]);
-    const csv = [headers, ...csvRows].map((row) => row.join(',')).join('\n');
+    const csv = [CSV_HEADERS, ...csvRows]
+      .map((row) => row.map((cell) => escapeCsvCell(cell)).join(','))
+      .join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -105,20 +197,116 @@ export default function UploadContent() {
     fileRef.current?.click();
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const fileName = file.name.toLowerCase();
 
-    if (!file.name.endsWith('.csv') && !file.name.endsWith('.xlsx')) {
-      setUploadStatus('error');
-      setTimeout(() => setUploadStatus('idle'), 4000);
+    if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
+      showUploadStatus('error', 'Invalid file format. Please upload a .csv or .xlsx file.');
       e.target.value = '';
       return;
     }
 
-    // TODO: replace with real upload + validation
-    setUploadStatus('success');
-    setTimeout(() => setUploadStatus('idle'), 4000);
+    if (fileName.endsWith('.xlsx')) {
+      // TODO: replace with real XLSX parsing + validation
+      showUploadStatus('warning', 'XLSX validation is not enabled in demo. Please upload the downloaded CSV template.');
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      const raw = await file.text();
+      const rows = parseCsv(raw);
+      if (rows.length < 2) {
+        showUploadStatus('error', 'Uploaded file is empty. Download a fresh template and try again.');
+        e.target.value = '';
+        return;
+      }
+
+      const header = rows[0];
+      const expected = CSV_HEADERS.map(normalizeHeader);
+      const actual = header.map(normalizeHeader);
+      const headerMatches =
+        expected.length === actual.length &&
+        expected.every((h, idx) => h === actual[idx]);
+      if (!headerMatches) {
+        showUploadStatus('error', 'Template structure mismatch. Please use the latest downloaded template.');
+        e.target.value = '';
+        return;
+      }
+
+      const geographyIdx = header.findIndex((h) => normalizeHeader(h) === normalizeHeader('Geography'));
+      const metricIdx = header.findIndex((h) => normalizeHeader(h) === normalizeHeader('Metric'));
+      const newValIdx = header.findIndex((h) => normalizeHeader(h) === normalizeHeader('New Val'));
+      if (geographyIdx === -1 || metricIdx === -1 || newValIdx === -1) {
+        showUploadStatus('error', 'Template is missing required columns (Geography, Metric, New Val).');
+        e.target.value = '';
+        return;
+      }
+
+      const accessibleKeys = new Set(filteredRows.map((r) => toAccessKey(r.geography, r.metric)));
+      let updatedRows = 0;
+      let ignoredRows = 0;
+      let unmatchedRows = 0;
+
+      setRowsByInitiative((prev) => {
+        const next = [...(prev[slug] ?? [])];
+        const indexByKey = new Map(
+          next.map((row, idx) => [toAccessKey(row.geography, row.metric), idx]),
+        );
+
+        for (const row of rows.slice(1)) {
+          const geography = (row[geographyIdx] ?? '').trim();
+          const metric = (row[metricIdx] ?? '').trim();
+          const newVal = (row[newValIdx] ?? '').trim();
+          if (!geography || !metric) {
+            unmatchedRows += 1;
+            continue;
+          }
+
+          const key = toAccessKey(geography, metric);
+          if (!accessibleKeys.has(key)) {
+            ignoredRows += 1;
+            continue;
+          }
+
+          const rowIndex = indexByKey.get(key);
+          if (rowIndex === undefined) {
+            unmatchedRows += 1;
+            continue;
+          }
+
+          next[rowIndex] = {
+            ...next[rowIndex],
+            newVal,
+          };
+          updatedRows += 1;
+        }
+
+        return {
+          ...prev,
+          [slug]: next,
+        };
+      });
+
+      if (updatedRows > 0 && ignoredRows === 0 && unmatchedRows === 0) {
+        showUploadStatus('success', `Upload successful. ${updatedRows} rows updated.`);
+      } else if (updatedRows > 0) {
+        showUploadStatus(
+          'warning',
+          `Upload partially applied: ${updatedRows} updated, ${ignoredRows} ignored (access control), ${unmatchedRows} unmatched.`,
+        );
+      } else {
+        showUploadStatus(
+          'warning',
+          'No accessible rows were updated. Ensure you are uploading your assigned template rows.',
+        );
+      }
+    } catch {
+      showUploadStatus('error', 'Could not parse uploaded file. Please download a fresh template and retry.');
+    }
+
     e.target.value = '';
   }
 
@@ -177,18 +365,22 @@ export default function UploadContent() {
       </div>
 
       {/* Upload status */}
-      {uploadStatus !== 'idle' && (
+      {uploadStatus.type !== 'idle' && (
         <div
           className={
-            uploadStatus === 'success'
+            uploadStatus.type === 'success'
               ? 'flex items-center gap-2 bg-[var(--color-success-light)] px-4 py-2 text-xs font-medium text-[var(--color-success)]'
+              : uploadStatus.type === 'warning'
+                ? 'flex items-center gap-2 bg-[var(--color-surface-warm)] px-4 py-2 text-xs font-medium text-[var(--color-warning)]'
               : 'flex items-center gap-2 bg-[var(--color-danger-light)] px-4 py-2 text-xs font-medium text-[var(--color-danger)]'
           }
         >
-          {uploadStatus === 'success' ? (
-            <><CheckCircle className="h-4 w-4" /> File uploaded successfully. Data will be validated and updated.</>
+          {uploadStatus.type === 'success' ? (
+            <><CheckCircle className="h-4 w-4" /> {uploadStatus.message}</>
+          ) : uploadStatus.type === 'warning' ? (
+            <><AlertCircle className="h-4 w-4" /> {uploadStatus.message}</>
           ) : (
-            <><AlertCircle className="h-4 w-4" /> Invalid file format. Please upload a .csv or .xlsx file.</>
+            <><AlertCircle className="h-4 w-4" /> {uploadStatus.message}</>
           )}
         </div>
       )}

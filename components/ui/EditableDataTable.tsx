@@ -16,6 +16,10 @@ export default function EditableDataTable({
   rows,
   onNewValChange,
 }: EditableDataTableProps) {
+  const metricNeedsDates = (metricName: string) =>
+    metricName === 'Total quantum of malba received at SCC' ||
+    metricName === 'MRS: Road coverage';
+
   const columns = [
     'Geography',
     'Metric',
@@ -66,9 +70,7 @@ export default function EditableDataTable({
         <tbody>
           {rows.map((row, i) => {
             const rowHasData = hasData(row);
-            const showDates =
-              row.metric === 'Total quantum of malba received at SCC' ||
-              row.metric.startsWith('MRS:');
+            const showDates = metricNeedsDates(row.metric);
 
             return (
               <tr
@@ -133,12 +135,24 @@ export default function EditableDataTable({
                   {row.lastUpdatedBy || '-'}
                 </td>
                 {/* Start date */}
-                <td className="whitespace-nowrap px-3 py-2 text-xs text-[var(--color-text-muted)]" style={{ fontSize: 10 }}>
-                  {showDates ? (row.startDate || '-') : ''}
+                <td
+                  className={cn(
+                    'whitespace-nowrap px-3 py-2 text-xs text-[var(--color-text-muted)]',
+                    showDates ? 'bg-[var(--color-cell-editable)]' : 'bg-[var(--color-cell-locked)]',
+                  )}
+                  style={{ fontSize: 10 }}
+                >
+                  {showDates ? (row.startDate || '-') : ' '}
                 </td>
                 {/* End date */}
-                <td className="whitespace-nowrap px-3 py-2 text-xs text-[var(--color-text-muted)]" style={{ fontSize: 10 }}>
-                  {showDates ? (row.endDate || '-') : ''}
+                <td
+                  className={cn(
+                    'whitespace-nowrap px-3 py-2 text-xs text-[var(--color-text-muted)]',
+                    showDates ? 'bg-[var(--color-cell-editable)]' : 'bg-[var(--color-cell-locked)]',
+                  )}
+                  style={{ fontSize: 10 }}
+                >
+                  {showDates ? (row.endDate || '-') : ' '}
                 </td>
                 {/* Remarks */}
                 <td className="px-3 py-2 text-xs text-[var(--color-text-muted)]">
