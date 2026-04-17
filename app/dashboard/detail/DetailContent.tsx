@@ -22,7 +22,6 @@ import ProgressMetricRow from '@/components/ui/ProgressMetricRow';
 import AverageOval from '@/components/ui/AverageOval';
 import DataTable from '@/components/ui/DataTable';
 import BottomBar from '@/components/layout/BottomBar';
-import BottomBar from '@/components/layout/BottomBar';
 import {
   STATES,
   CITIES,

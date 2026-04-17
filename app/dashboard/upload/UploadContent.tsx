@@ -40,8 +40,6 @@ export default function UploadContent() {
     }
   );
 
-  const allRows = rowsByInitiative[slug] ?? [];
-
   const stateOptions = ['All', ...UPLOAD_STATE_OPTIONS];
 
   const cityOptions = useMemo(() => {
@@ -53,6 +51,7 @@ export default function UploadContent() {
   }, [state]);
 
   const filteredRows = useMemo(() => {
+    const allRows = rowsByInitiative[slug] ?? [];
     let filtered = allRows;
     if (city !== 'All') {
       filtered = filtered.filter((r) => r.geography === city);
@@ -61,7 +60,7 @@ export default function UploadContent() {
       filtered = filtered.filter((r) => stateCities.includes(r.geography));
     }
     return filtered;
-  }, [allRows, state, city]);
+  }, [rowsByInitiative, slug, state, city]);
 
   function handleStateChange(v: string) {
     setState(v);
