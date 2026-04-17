@@ -26,7 +26,7 @@ export const INITIATIVES: Initiative[] = [
       { name: 'No. of Events Planned', type: 'progress', target: 300, achieved: 180 },
       { name: 'No. of Outlets Activated', type: 'progress', target: 1500, achieved: 950 },
       { name: 'EOIs and Scrapping Requests', type: 'progress', target: 200000, achieved: 50000 },
-      { name: 'PSBs / NBFCs Onboarded', type: 'progress', target: 7, achieved: 5 },
+      { name: 'PSBs / NBFCs Onboarded', type: 'progress', target: 7, achieved: 5, geographyLevel: 'central' },
     ],
   },
   {

@@ -21,6 +21,7 @@ import ProgressMetricRow from '@/components/ui/ProgressMetricRow';
 import AverageOval from '@/components/ui/AverageOval';
 import DataTable from '@/components/ui/DataTable';
 import BottomBar from '@/components/layout/BottomBar';
+import { getCompletionPercentage } from '@/lib/utils';
 import {
   STATES,
   CITIES,
@@ -46,9 +47,17 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
   const [cityFilter, setCityFilter] = useState('All');
   const [rtoFilter, setRtoFilter] = useState('All');
   const [viewLevel, setViewLevel] = useState<ViewLevel>('state');
+  const [selectedMetricByInitiative, setSelectedMetricByInitiative] = useState<Record<string, string>>({});
 
   const currentInit = initiatives.find((i) => i.name === selectedInitiative) ?? initiatives[0];
   const summaryData = MOCK_SUMMARY_BY_INITIATIVE[currentInit.slug];
+  const outcomeMetrics = currentInit.metrics.filter((m) => m.type === 'outcome');
+  const progressMetrics = currentInit.metrics.filter((m) => m.type === 'progress');
+  const readinessMetrics = currentInit.metrics.filter((m) => m.type === 'readiness');
+  const defaultSelectedMetricName = outcomeMetrics[0]?.name ?? currentInit.metrics[0]?.name ?? '';
+  const selectedMetricName = selectedMetricByInitiative[currentInit.slug] ?? defaultSelectedMetricName;
+  const selectedMetric = currentInit.metrics.find((m) => m.name === selectedMetricName) ?? currentInit.metrics[0];
+  const isCentralLevelMetric = selectedMetric?.geographyLevel === 'central';
 
   const initiativeNames = initiatives.map((i) => i.name);
   const viewLabel: (typeof VIEW_LEVELS)[number] =
@@ -172,20 +181,18 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     return rows.filter((r) => r.label === rtoFilter);
   }, [stateFilter, cityFilter, rtoFilter]);
 
-  const displayedTableRows =
-    effectiveViewLevel === 'state'
-      ? stateTableRows
-      : effectiveViewLevel === 'city'
-        ? filteredCityRows
-        : rtoTableRows;
+  const displayedTableRows = useMemo(() => {
+    if (isCentralLevelMetric) return [];
+    if (effectiveViewLevel === 'state') return stateTableRows;
+    if (effectiveViewLevel === 'city') return filteredCityRows;
+    return rtoTableRows;
+  }, [isCentralLevelMetric, effectiveViewLevel, stateTableRows, filteredCityRows, rtoTableRows]);
 
-  const displayedMapData =
-    effectiveViewLevel === 'state'
+  const displayedMapData = isCentralLevelMetric
+    ? []
+    : effectiveViewLevel === 'state'
       ? summaryData?.map ?? []
       : filteredMapData;
-
-  const outcomeMetrics = currentInit.metrics.filter((m) => m.type === 'outcome');
-  const progressMetrics = currentInit.metrics.filter((m) => m.type === 'progress');
 
   const delhiNcrAvg = summaryData
     ? Math.round(summaryData.table.reduce((s, r) => s + r.completion, 0) / summaryData.table.length)
@@ -203,11 +210,24 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     return cityRow?.completion ?? 0;
   }, [cityFilter, stateAvg]);
 
-  const filteredGeoCompletion = useMemo(() => {
-    if (displayedTableRows.length === 0) return 0;
-    const total = displayedTableRows.reduce((acc, row) => acc + row.completion, 0);
-    return Math.round(total / displayedTableRows.length);
-  }, [displayedTableRows]);
+  const filteredGeoCompletion =
+    isCentralLevelMetric && selectedMetric
+      ? getCompletionPercentage(selectedMetric.target, selectedMetric.achieved)
+      : displayedTableRows.length === 0
+        ? 0
+        : Math.round(
+            displayedTableRows.reduce((acc, row) => acc + row.completion, 0) /
+              displayedTableRows.length,
+          );
+
+  const geographyLabel =
+    effectiveViewLevel === 'state'
+      ? 'State'
+      : effectiveViewLevel === 'city'
+        ? 'City'
+        : 'RTO';
+  const secondaryMetric =
+    currentInit.metrics.find((m) => m.name !== selectedMetric?.name && m.geographyLevel !== 'central');
 
   function handleViewLevelChange(v: string) {
     setViewLevel(v.toLowerCase() as ViewLevel);
@@ -260,6 +280,11 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
             <span className="inline-flex rounded-full bg-[var(--color-surface-light)] px-3 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
               % completion of filtered geo: {filteredGeoCompletion}%
             </span>
+            {isCentralLevelMetric ? (
+              <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
+                Selected metric is central-level; map shows center bubble only.
+              </p>
+            ) : null}
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center px-3">
             <div className="h-full w-full max-h-[560px] max-w-[720px]">
@@ -300,6 +325,13 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
                   label={m.name}
                   achieved={m.achieved}
                   target={m.target}
+                  selected={selectedMetric?.name === m.name}
+                  onSelect={() =>
+                    setSelectedMetricByInitiative((prev) => ({
+                      ...prev,
+                      [currentInit.slug]: m.name,
+                    }))
+                  }
                 />
               ))
             ) : (
@@ -326,6 +358,43 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
                       label={m.name}
                       achieved={m.achieved}
                       target={m.target}
+                      selected={selectedMetric?.name === m.name}
+                      onSelect={() =>
+                        setSelectedMetricByInitiative((prev) => ({
+                          ...prev,
+                          [currentInit.slug]: m.name,
+                        }))
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+          {readinessMetrics.length > 0 && (
+            <>
+              <div className="shrink-0 bg-[var(--color-navy)] px-4 py-2">
+                <h3 className="text-xs font-semibold text-[var(--color-text-white)]">
+                  Readiness metrics
+                </h3>
+              </div>
+              <div className="space-y-2 p-3">
+                {readinessMetrics.map((m, i) => {
+                  const icons = [ClipboardList, Store, FileText, Landmark];
+                  return (
+                    <ProgressMetricRow
+                      key={m.name}
+                      icon={icons[i % icons.length]}
+                      label={m.name}
+                      achieved={m.achieved}
+                      target={m.target}
+                      selected={selectedMetric?.name === m.name}
+                      onSelect={() =>
+                        setSelectedMetricByInitiative((prev) => ({
+                          ...prev,
+                          [currentInit.slug]: m.name,
+                        }))
+                      }
                     />
                   );
                 })}
@@ -337,38 +406,41 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
 
       {/* ── BOTTOM HALF — Dual Data Tables ── */}
       <div className="shrink-0 px-4 py-3">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DataTable
-            title={outcomeMetrics[0]?.name ?? currentInit.primaryMetric}
-            geographyLabel={
-              effectiveViewLevel === 'state'
-                ? 'State'
-                : effectiveViewLevel === 'city'
-                  ? 'City'
-                  : 'RTO'
-            }
-            rows={displayedTableRows}
-          />
-          {outcomeMetrics.length > 1 ? (
-            <DataTable
-              title={outcomeMetrics[1].name}
-              geographyLabel={
-                effectiveViewLevel === 'state'
-                  ? 'State'
-                  : effectiveViewLevel === 'city'
-                    ? 'City'
-                    : 'RTO'
-              }
-              rows={displayedTableRows}
-            />
-          ) : (
+        {isCentralLevelMetric ? (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="flex items-center justify-center rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
+              <p className="text-xs text-[var(--color-text-muted)]">
+                {selectedMetric?.name ?? 'Selected metric'} is central-level and does not appear in the geography table.
+              </p>
+            </div>
             <div className="flex items-center justify-center rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
               <p className="text-xs text-[var(--color-text-muted)]">
                 All other metrics on right side &raquo;
               </p>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <DataTable
+              title={selectedMetric?.name ?? currentInit.primaryMetric}
+              geographyLabel={geographyLabel}
+              rows={displayedTableRows}
+            />
+            {secondaryMetric ? (
+              <DataTable
+                title={secondaryMetric.name}
+                geographyLabel={geographyLabel}
+                rows={displayedTableRows}
+              />
+            ) : (
+              <div className="flex items-center justify-center rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  All other metrics on right side &raquo;
+                </p>
+              </div>
+            )}
+          </div>
+        )}
         <p className="mt-2 text-center text-[var(--color-text-muted)]" style={{ fontSize: '10px' }}>
           The Y-axis of the table will change according to the view selected above;
           only metrics applicable to the selected view will be shown.

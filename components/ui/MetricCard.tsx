@@ -13,6 +13,8 @@ interface MetricCardProps {
   achieved: number | null;
   target: number | null;
   barColorOverride?: string;
+  selected?: boolean;
+  onSelect?: () => void;
   className?: string;
 }
 
@@ -21,14 +23,26 @@ export default function MetricCard({
   label,
   achieved,
   target,
+  selected = false,
+  onSelect,
   className,
 }: MetricCardProps) {
   const pct = getCompletionPercentage(target, achieved);
+  const isInteractive = Boolean(onSelect);
+  const Container = isInteractive ? 'button' : 'div';
 
   return (
-    <div
+    <Container
+      type={isInteractive ? 'button' : undefined}
+      onClick={onSelect}
+      aria-pressed={isInteractive ? selected : undefined}
       className={cn(
-        'relative rounded-lg border border-[var(--color-border)] bg-white p-3',
+        'relative rounded-lg border bg-white p-3',
+        selected
+          ? 'border-[var(--color-border-blue)] ring-1 ring-[var(--color-border-blue)]'
+          : 'border-[var(--color-border)]',
+        isInteractive &&
+          'cursor-pointer transition-colors hover:bg-[var(--color-blue-pale)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2',
         className,
       )}
     >
@@ -55,6 +69,6 @@ export default function MetricCard({
           <Info className="h-3 w-3" />
         </span>
       </div>
-    </div>
+    </Container>
   );
 }
