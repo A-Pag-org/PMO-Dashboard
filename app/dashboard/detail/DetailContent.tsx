@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Truck,
   Calendar,
@@ -51,6 +51,15 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
   const summaryData = MOCK_SUMMARY_BY_INITIATIVE[currentInit.slug];
 
   const initiativeNames = initiatives.map((i) => i.name);
+  const viewLabel: (typeof VIEW_LEVELS)[number] =
+    viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO';
+
+  // Wireframe note: available views adapt to selected geography.
+  const availableViewLevels = useMemo<readonly (typeof VIEW_LEVELS)[number][]>(() => {
+    if (cityFilter !== 'All') return ['RTO'];
+    if (stateFilter !== 'All') return ['City', 'RTO'];
+    return VIEW_LEVELS;
+  }, [stateFilter, cityFilter]);
 
   // Cascading filter options
   const stateOptions = ['All', ...STATES];
@@ -82,6 +91,13 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     setRtoFilter('All');
   }
 
+  useEffect(() => {
+    if (!availableViewLevels.includes(viewLabel)) {
+      const next = availableViewLevels[0] ?? 'State';
+      setViewLevel(next.toLowerCase() as ViewLevel);
+    }
+  }, [availableViewLevels, viewLabel]);
+
   // Filter map data based on selections
   const filteredMapData = useMemo(() => {
     let data = MOCK_DETAIL_MAP_DATA;
@@ -94,8 +110,8 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     return data;
   }, [stateFilter, cityFilter]);
 
-  // Filter table data
-  const filteredTableRows = useMemo(() => {
+  // Filter table data at city granularity
+  const filteredCityRows = useMemo(() => {
     let rows = MOCK_DETAIL_TABLE_ALL;
     if (stateFilter !== 'All') {
       rows = rows.filter((r) => CITY_STATE_MAP[r.geography] === stateFilter);
@@ -110,6 +126,67 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
       completion: r.completion,
     }));
   }, [stateFilter, cityFilter]);
+
+  // State table rows (for state view)
+  const stateTableRows = useMemo(
+    () =>
+      (summaryData?.table ?? [])
+        .filter((r) => stateFilter === 'All' || r.state === stateFilter)
+        .map((r) => ({
+          label: r.state,
+          target: r.target,
+          achieved: r.achieved,
+          completion: r.completion,
+        })),
+    [summaryData, stateFilter],
+  );
+
+  // RTO rows are derived from city totals for demo behavior.
+  const rtoTableRows = useMemo(() => {
+    const cityBaseRows = MOCK_DETAIL_TABLE_ALL.filter((r) => {
+      if (stateFilter !== 'All' && CITY_STATE_MAP[r.geography] !== stateFilter) return false;
+      if (cityFilter !== 'All' && r.geography !== cityFilter) return false;
+      return true;
+    });
+
+    const rows = cityBaseRows.flatMap((cityRow) => {
+      const rtos = RTO_OPTIONS_BY_CITY[cityRow.geography] ?? [`${cityRow.geography} RTO`];
+      const perTarget = Math.floor(cityRow.target / rtos.length);
+      const perAchieved = Math.floor(cityRow.achieved / rtos.length);
+
+      return rtos.map((rtoName, idx) => {
+        const last = idx === rtos.length - 1;
+        const target = last
+          ? cityRow.target - perTarget * (rtos.length - 1)
+          : perTarget;
+        const achieved = last
+          ? cityRow.achieved - perAchieved * (rtos.length - 1)
+          : perAchieved;
+        const completion = target > 0 ? Math.round((achieved / target) * 100) : 0;
+        return {
+          label: rtoName,
+          target,
+          achieved,
+          completion,
+        };
+      });
+    });
+
+    if (rtoFilter === 'All') return rows;
+    return rows.filter((r) => r.label === rtoFilter);
+  }, [stateFilter, cityFilter, rtoFilter]);
+
+  const displayedTableRows =
+    viewLevel === 'state'
+      ? stateTableRows
+      : viewLevel === 'city'
+        ? filteredCityRows
+        : rtoTableRows;
+
+  const displayedMapData =
+    viewLevel === 'state'
+      ? summaryData?.map ?? []
+      : filteredMapData;
 
   const outcomeMetrics = currentInit.metrics.filter((m) => m.type === 'outcome');
   const progressMetrics = currentInit.metrics.filter((m) => m.type === 'progress');
@@ -129,6 +206,12 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
     const cityRow = MOCK_DETAIL_TABLE_ALL.find((r) => r.geography === cityFilter);
     return cityRow?.completion ?? 0;
   }, [cityFilter, stateAvg]);
+
+  const filteredGeoCompletion = useMemo(() => {
+    if (displayedTableRows.length === 0) return 0;
+    const total = displayedTableRows.reduce((acc, row) => acc + row.completion, 0);
+    return Math.round(total / displayedTableRows.length);
+  }, [displayedTableRows]);
 
   function handleViewLevelChange(v: string) {
     setViewLevel(v.toLowerCase() as ViewLevel);
@@ -175,16 +258,17 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
             </h2>
           </div>
           <div className="shrink-0 px-4 py-2">
-            <ViewToggle
-              options={VIEW_LEVELS}
-              value={viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO'}
-              onChange={handleViewLevelChange}
-            />
+            <ViewToggle options={availableViewLevels} value={viewLabel} onChange={handleViewLevelChange} />
+          </div>
+          <div className="px-4 pb-1">
+            <span className="inline-flex rounded-full bg-[var(--color-surface-light)] px-3 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+              % completion of filtered geo: {filteredGeoCompletion}%
+            </span>
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center px-3">
             <div className="h-full w-full max-h-[560px] max-w-[720px]">
               <DelhiNCRMap
-                data={viewLevel === 'state' ? (summaryData?.map ?? []) : filteredMapData}
+                data={displayedMapData}
                 centerBubble={summaryData?.center ?? MOCK_DETAIL_CENTER_BUBBLE}
               />
             </div>
@@ -260,14 +344,14 @@ export default function DetailContent({ initiatives }: DetailContentProps) {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DataTable
             title={outcomeMetrics[0]?.name ?? currentInit.primaryMetric}
-            geographyLabel="Geography"
-            rows={filteredTableRows}
+            geographyLabel={viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO'}
+            rows={displayedTableRows}
           />
           {outcomeMetrics.length > 1 ? (
             <DataTable
               title={outcomeMetrics[1].name}
-              geographyLabel="Geography"
-              rows={filteredTableRows}
+              geographyLabel={viewLevel === 'state' ? 'State' : viewLevel === 'city' ? 'City' : 'RTO'}
+              rows={displayedTableRows}
             />
           ) : (
             <div className="flex items-center justify-center rounded-lg border border-dashed border-[var(--color-border-table)] p-6">
